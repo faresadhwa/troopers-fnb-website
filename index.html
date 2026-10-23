@@ -5,9 +5,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TROOPERS — F&amp;B Staffing</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"><style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
 body{margin:0;background:#131249;font-family:'Poppins',system-ui,sans-serif;color:#fff;-webkit-font-smoothing:antialiased}
-#sheet,#calls{scroll-margin-top:76px}
+#sheet,#calls,#coverage{scroll-margin-top:76px}
 a{color:#F47F20;text-decoration:none}
 .footer-link{color:inherit;transition:color .2s ease}
 .footer-link:hover{color:#F47F20}
@@ -53,6 +55,15 @@ header nav a{transition:color .25s ease;padding-bottom:4px}
 .hero-anim{animation-play-state:paused}
 body.loaded .hero-anim{animation-play-state:running}
 @keyframes badgePop{0%{opacity:0;transform:rotate(-7deg) scale(.5)}65%{opacity:1;transform:rotate(-7deg) scale(1.1)}100%{opacity:1;transform:rotate(-7deg) scale(1)}}
+#globeWrap{position:relative;display:flex;align-items:center;justify-content:center}
+#globeCanvas{cursor:grab;touch-action:none}
+#globeCanvas.locked{cursor:default}
+#globeCanvas:active{cursor:grabbing}
+#hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);background:rgba(255,255,255,.06);padding:8px 14px;border-radius:20px;pointer-events:none;white-space:nowrap;transition:opacity .3s ease}
+#tooltip{position:absolute;pointer-events:none;background:#F47F20;color:#131249;font-weight:700;font-size:13px;padding:6px 12px;border-radius:8px;opacity:0;transition:opacity .15s ease;white-space:nowrap;transform:translate(-50%,-130%)}
+.state-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid rgba(255,255,255,.18);border-radius:20px;font-size:12.5px;color:rgba(255,255,255,.75);transition:border-color .2s ease,color .2s ease,background .2s ease;cursor:default}
+.state-chip.active{border-color:#F47F20;color:#fff;background:rgba(244,127,32,.12)}
+.state-dot{width:7px;height:7px;border-radius:50%;background:#F47F20;flex:none}
 </style>
 <style>
 .h1:hover{animation-play-state:paused}
@@ -91,6 +102,7 @@ body.loaded .hero-anim{animation-play-state:running}
     </a>
     <nav id="siteNav" style="position:relative;display:flex;gap:20px;font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;flex-wrap:wrap">
       <a href="#sheet" style="color:rgba(255,255,255,.7)" data-ms="Senarai Syif">Call sheet</a>
+      <a href="#coverage" style="color:rgba(255,255,255,.7)" data-ms="Liputan">Coverage</a>
       <a href="#calls" style="color:rgba(255,255,255,.7)" data-ms="Sebab mereka hubungi">Why they call</a>
       <span id="navIndicator"></span>
     </nav>
@@ -220,6 +232,21 @@ body.loaded .hero-anim{animation-play-state:running}
   </div>
 </section>
 
+<section id="coverage" style="max-width:1400px;margin:0 auto;padding:76px 26px 0;text-align:center">
+  <div class="reveal" style="font-size:11px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:#F47F20" data-ms="Liputan seluruh negara">Nationwide coverage</div>
+  <h2 class="reveal" style="font-size:clamp(34px,5vw,62px);font-weight:700;letter-spacing:-.04em;line-height:.94;margin-top:10px" data-ms="Part-timer, di lapangan di setiap negeri.">Part-timers, on the ground in every state.</h2>
+  <p class="reveal" style="font-size:14.5px;line-height:1.6;color:rgba(255,255,255,.6);max-width:34em;margin:14px auto 0" data-ms="Setiap titik menyala mewakili sebuah negeri dengan bakat aktif di platform.">Every lit-up point is a state with active talent on the platform.</p>
+
+  <div id="globeWrap" class="reveal" style="margin-top:36px">
+    <canvas id="globeCanvas"></canvas>
+    <div id="tooltip"></div>
+    <div id="hint">Finding Malaysia…</div>
+  </div>
+  <div id="coverageLoading" style="text-align:center;padding:60px 0"><div class="spinner"></div><p style="margin-top:14px;font-size:12.5px;color:rgba(255,255,255,.5)">Loading map…</p></div>
+
+  <div id="stateChips" style="max-width:900px;margin:36px auto 0;display:flex;flex-wrap:wrap;gap:10px;justify-content:center"></div>
+</section>
+
 <section id="calls" style="max-width:1400px;margin:0 auto;padding:76px 26px 0">
   <h2 style="font-size:clamp(34px,5vw,62px);font-weight:700;letter-spacing:-.04em;line-height:.94;max-width:20em" data-ms="4 situasi anda perlukan staf tambahan">Four reasons the phone rings</h2>
   <div class="calls-grid" style="margin-top:44px;align-items:start">
@@ -301,7 +328,7 @@ body.loaded .hero-anim{animation-play-state:running}
       </div>
     </div>
     <div class="reveal" style="flex:1.6;min-width:240px">
-      <a href="./states-map.html" style="font-size:10.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#F47F20;text-decoration:underline;text-underline-offset:3px" data-ms="Negeri · Lihat peta">States · View map</a>
+      <a href="#coverage" style="font-size:10.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#F47F20;text-decoration:underline;text-underline-offset:3px" data-ms="Negeri · Lihat peta">States · View map</a>
       <div style="column-count:2;column-gap:20px;margin-top:14px;font-size:13.5px;color:rgba(255,255,255,.7)">
         <span style="display:block;break-inside:avoid;margin-bottom:8px" data-ms="Wilayah Persekutuan">Federal Territories</span>
         <span style="display:block;break-inside:avoid;margin-bottom:8px">Selangor</span>
@@ -429,7 +456,7 @@ body.loaded .hero-anim{animation-play-state:running}
       try{ history.pushState(null,'',location.pathname); }catch(err){}
     });
   }
-  var sections = ['sheet','calls'].map(function(id){ return document.getElementById(id); }).filter(Boolean);
+  var sections = ['sheet','coverage','calls'].map(function(id){ return document.getElementById(id); }).filter(Boolean);
   var ticking = false;
   function onScroll(){
     if(ticking || autoScrolling) return;
@@ -462,7 +489,7 @@ body.loaded .hero-anim{animation-play-state:running}
     });
   }
   window.__revealSection = revealGroup;
-  var groups = Array.prototype.slice.call(document.querySelectorAll('#sheet,#calls,#finalcta,#siteFooter'));
+  var groups = Array.prototype.slice.call(document.querySelectorAll('#sheet,#coverage,#calls,#finalcta,#siteFooter'));
   if('IntersectionObserver' in window){
     var io = new IntersectionObserver(function(entries){
       if(window.__navAutoScrolling) return;
@@ -537,6 +564,318 @@ body.loaded .hero-anim{animation-play-state:running}
   if(document.readyState === 'complete'){ ready(); }
   else { window.addEventListener('load', ready); }
   setTimeout(hide, MAX);
+})();
+</script>
+
+<script>
+(function(){
+  var coverageSection = document.getElementById('coverage');
+  if(!coverageSection || typeof d3 === 'undefined') return;
+  var started = false;
+
+  async function startGlobe(){
+    const canvas = document.getElementById('globeCanvas');
+    const ctx = canvas.getContext('2d');
+    const tooltip = document.getElementById('tooltip');
+    const loading = document.getElementById('coverageLoading');
+    const chipsHost = document.getElementById('stateChips');
+    const hint = document.getElementById('hint');
+
+    const W = Math.min(1000, window.innerWidth - 40);
+    const H = Math.min(W / 2, window.innerHeight * 0.55);
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.scale(dpr, dpr);
+
+    const projection = d3.geoOrthographic().clipAngle(90).translate([W/2, H/2]);
+    const path = d3.geoPath(projection, ctx);
+
+    let world, malaysia;
+    try {
+      [world, malaysia] = await Promise.all([
+        fetch('./assets/world-land.geojson').then(r => r.json()),
+        fetch('./assets/malaysia-states.geojson').then(r => r.json())
+      ]);
+    } catch (e) {
+      loading.innerHTML = '<p style="color:rgba(255,255,255,.6);font-size:13px">Could not load the map right now.</p>';
+      return;
+    }
+
+    function pointInRing(pt, ring){
+      let inside = false;
+      for (let i=0, j=ring.length-1; i<ring.length; j=i++){
+        const xi=ring[i][0], yi=ring[i][1], xj=ring[j][0], yj=ring[j][1];
+        if ((yi>pt[1]) !== (yj>pt[1]) && pt[0] < (xj-xi)*(pt[1]-yi)/(yj-yi)+xi) inside = !inside;
+      }
+      return inside;
+    }
+    function pointInFeature(pt, feature){
+      const g = feature.geometry;
+      const polys = g.type === 'Polygon' ? [g.coordinates] : g.coordinates;
+      for (const poly of polys){
+        if (pointInRing(pt, poly[0])){
+          let hole = false;
+          for (let i=1;i<poly.length;i++){ if (pointInRing(pt, poly[i])){ hole = true; break; } }
+          if (!hole) return true;
+        }
+      }
+      return false;
+    }
+    function dotsForFeatures(features, step){
+      const dots = [];
+      features.forEach(feature => {
+        const [[minLng,minLat],[maxLng,maxLat]] = d3.geoBounds(feature);
+        for (let lng=minLng; lng<=maxLng; lng+=step){
+          for (let lat=minLat; lat<=maxLat; lat+=step){
+            if (pointInFeature([lng,lat], feature)) dots.push({lng, lat});
+          }
+        }
+      });
+      return dots;
+    }
+
+    const worldDots = dotsForFeatures(world.features, 1.3);
+    const worldRadius = Math.min(W, H)/2.3;
+
+    const centerLon = 109.7, centerLat = 4.0;
+    const malaysiaRotate = [-centerLon, -centerLat, 0];
+    projection.rotate(malaysiaRotate);
+    projection.fitExtent([[W*0.05, H*0.1],[W*0.95, H*0.9]], {type:'FeatureCollection', features: malaysia.features});
+    const malaysiaScale = projection.scale();
+    projection.rotate([0,0,0]).scale(worldRadius);
+
+    const markers = malaysia.features.map(f => {
+      const c = d3.geoCentroid(f);
+      return { lng: c[0], lat: c[1], name: f.properties.name || 'Unknown', feature: f };
+    });
+    const stateNames = markers.map(m => m.name);
+    stateNames.forEach(name => {
+      const chip = document.createElement('span');
+      chip.className = 'state-chip';
+      chip.dataset.name = name;
+      chip.innerHTML = '<span class="state-dot"></span>' + name;
+      chipsHost.appendChild(chip);
+    });
+
+    loading.style.display = 'none';
+
+    const INTRO_MS = 4200;
+    const ROTATE_MS = 1600;
+    const ZOOM_MS = 1800;
+    const startTime = performance.now();
+    let phase = 'intro';
+    let stepStartRotate = null;
+    let stepStartTime = 0;
+    let hoveredFeature = -1;
+    let interactive = false;
+
+    function easeCubic(t){ return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+
+    function render(now){
+      const elapsed = now - startTime;
+      ctx.clearRect(0,0,W,H);
+
+      if (phase === 'intro'){
+        const r = projection.rotate();
+        projection.rotate([r[0] + 0.85, r[1]*0.98, 0]);
+        if (elapsed > INTRO_MS){
+          phase = 'rotating';
+          stepStartRotate = projection.rotate();
+          stepStartTime = now;
+        }
+      } else if (phase === 'rotating'){
+        let t = (now - stepStartTime) / ROTATE_MS;
+        if (t >= 1){
+          t = 1;
+          phase = 'zooming';
+          stepStartTime = now;
+        }
+        const te = easeCubic(t);
+        const r0 = stepStartRotate;
+        let dLon = malaysiaRotate[0] - r0[0];
+        dLon = ((dLon + 540) % 360) - 180;
+        const curLon = r0[0] + dLon * te;
+        const curLat = r0[1] + (malaysiaRotate[1] - r0[1]) * te;
+        projection.rotate([curLon, curLat, 0]);
+        projection.scale(worldRadius);
+        render._blend = 0;
+      } else if (phase === 'zooming'){
+        let t = (now - stepStartTime) / ZOOM_MS;
+        if (t >= 1){
+          t = 1;
+          phase = 'settled';
+          interactive = true;
+          hint.textContent = 'Drag to rotate · Scroll to zoom';
+          canvas.classList.remove('locked');
+        }
+        const te = easeCubic(t);
+        projection.rotate(malaysiaRotate);
+        projection.scale(worldRadius + (malaysiaScale - worldRadius) * te);
+        render._blend = te;
+      } else if (phase === 'settled'){
+        render._blend = 1;
+      }
+
+      const scale = projection.scale();
+      const worldBlend = (phase === 'intro' || phase === 'rotating') ? 1 : (phase === 'zooming' ? 1 - render._blend : 0);
+      const malaysiaBlend = (phase === 'intro' || phase === 'rotating') ? 0 : (phase === 'zooming' ? render._blend : 1);
+
+      ctx.beginPath();
+      ctx.arc(W/2, H/2, scale, 0, 2*Math.PI);
+      ctx.fillStyle = '#0d0c38';
+      ctx.fill();
+      if (scale < Math.min(W,H)*0.9){
+        ctx.strokeStyle = 'rgba(244,127,32,.5)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      const graticule = d3.geoGraticule().step([10,10]);
+      ctx.beginPath();
+      path(graticule());
+      ctx.strokeStyle = 'rgba(255,255,255,.12)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      if (worldBlend > 0.01){
+        ctx.globalAlpha = worldBlend;
+        ctx.beginPath();
+        world.features.forEach(f => path(f));
+        ctx.strokeStyle = 'rgba(255,255,255,.35)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        worldDots.forEach(dot => {
+          const p = projection([dot.lng, dot.lat]);
+          if (!p || p[0]<0 || p[0]>W || p[1]<0 || p[1]>H) return;
+          ctx.beginPath();
+          ctx.arc(p[0], p[1], 1.1, 0, 2*Math.PI);
+          ctx.fillStyle = 'rgba(244,127,32,.7)';
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+      }
+
+      if (malaysiaBlend > 0.01){
+        ctx.globalAlpha = malaysiaBlend;
+        malaysia.features.forEach((feature, idx) => {
+          ctx.beginPath();
+          path(feature);
+          ctx.strokeStyle = idx === hoveredFeature ? '#F47F20' : 'rgba(255,255,255,.45)';
+          ctx.lineWidth = idx === hoveredFeature ? 2 : 1;
+          ctx.stroke();
+        });
+
+        const scaleFactor = Math.min(1.6, Math.max(0.6, scale / malaysiaScale));
+        markers.forEach((m, idx) => {
+          const p = projection([m.lng, m.lat]);
+          if (!p) return;
+          const isHot = idx === hoveredFeature;
+          const pulse = ((now * 0.001 + idx*0.35) % 1.6) / 1.6;
+          const ringR = (4 + pulse*13) * scaleFactor;
+          ctx.beginPath();
+          ctx.arc(p[0], p[1], ringR, 0, 2*Math.PI);
+          ctx.strokeStyle = `rgba(244,127,32,${(1-pulse)*0.55})`;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(p[0], p[1], (isHot ? 5.5 : 3.5) * scaleFactor, 0, 2*Math.PI);
+          ctx.fillStyle = isHot ? '#ffffff' : '#F47F20';
+          ctx.shadowColor = '#F47F20';
+          ctx.shadowBlur = isHot ? 14 : 8;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        });
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    setInterval(() => render(performance.now()), 16);
+
+    function findFeatureAt(mx, my){
+      const lonlat = projection.invert ? projection.invert([mx, my]) : null;
+      if (!lonlat || isNaN(lonlat[0])) return -1;
+      for (let i=0;i<malaysia.features.length;i++){
+        if (pointInFeature(lonlat, malaysia.features[i])) return i;
+      }
+      return -1;
+    }
+    function setActiveChip(name){
+      [...chipsHost.children].forEach(c => c.classList.toggle('active', c.dataset.name === name));
+    }
+
+    let dragging = false, lastX = 0, lastY = 0, rotation0 = null;
+
+    function pointerDown(x, y){
+      if (!interactive) return;
+      dragging = true;
+      lastX = x; lastY = y;
+      rotation0 = projection.rotate();
+    }
+    function pointerMove(x, y){
+      if (!interactive) return;
+      const rect = canvas.getBoundingClientRect();
+      const mx = x - rect.left, my = y - rect.top;
+      if (dragging){
+        const dx = x - lastX, dy = y - lastY;
+        const sensitivity = 0.06;
+        const r = [rotation0[0] + dx*sensitivity, Math.max(-90, Math.min(90, rotation0[1] - dy*sensitivity)), 0];
+        projection.rotate(r);
+      } else {
+        const idx = findFeatureAt(mx, my);
+        if (idx !== hoveredFeature) hoveredFeature = idx;
+        if (idx >= 0){
+          tooltip.textContent = stateNames[idx];
+          tooltip.style.left = mx + 'px';
+          tooltip.style.top = my + 'px';
+          tooltip.style.opacity = 1;
+          setActiveChip(stateNames[idx]);
+        } else {
+          tooltip.style.opacity = 0;
+          setActiveChip(null);
+        }
+      }
+    }
+    function pointerUp(){
+      dragging = false;
+    }
+
+    canvas.addEventListener('mousedown', e => pointerDown(e.clientX, e.clientY));
+    window.addEventListener('mousemove', e => pointerMove(e.clientX, e.clientY));
+    window.addEventListener('mouseup', pointerUp);
+    canvas.addEventListener('mouseleave', () => { if (!dragging && interactive){ tooltip.style.opacity = 0; hoveredFeature = -1; setActiveChip(null); } });
+
+    canvas.addEventListener('touchstart', e => { const t = e.touches[0]; pointerDown(t.clientX, t.clientY); }, {passive:true});
+    canvas.addEventListener('touchmove', e => { const t = e.touches[0]; pointerMove(t.clientX, t.clientY); }, {passive:true});
+    canvas.addEventListener('touchend', pointerUp);
+
+    canvas.addEventListener('wheel', e => {
+      if (!interactive) return;
+      e.preventDefault();
+      const factor = e.deltaY > 0 ? 0.92 : 1.08;
+      const next = Math.max(malaysiaScale*0.6, Math.min(malaysiaScale*4, projection.scale()*factor));
+      projection.scale(next);
+    }, {passive:false});
+  }
+
+  function trigger(){
+    if(started) return;
+    started = true;
+    startGlobe();
+  }
+  if('IntersectionObserver' in window){
+    var io2 = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){ trigger(); io2.unobserve(entry.target); }
+      });
+    }, {rootMargin:'0px 0px -20% 0px', threshold:0.01});
+    io2.observe(coverageSection);
+  } else {
+    trigger();
+  }
 })();
 </script>
 </body>
