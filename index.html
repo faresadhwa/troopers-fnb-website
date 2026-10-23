@@ -5,7 +5,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TROOPERS — F&amp;B Staffing</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23131249'/%3E%3Cpath d='M16 18h32v8H36v22h-8V26H16z' fill='%23F47F20'/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="128x128" href="./assets/favicon-128.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png">
+<link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
 <style>
@@ -845,9 +847,9 @@ window.COVERAGE = {
     });
     var SG_IDX = markers.length;
     markers.push({lng:SG.lng, lat:SG.lat, name:'Singapore', feature:null});
-    /* Singapore: five official region outlines, plus South as a pin (Troopers counts South, the government map has no such region). */
+    /* Singapore: six areas. Five are the official regions; South is cut out of Central (Bukit Merah, Queenstown, Marina South, Straits View, southern islands), see tools/dissolve-sg-areas.cjs. */
     var SG_AREAS = ['Central','East','North','North East','West','South'];
-    var SG_AT = {'Central':[103.835,1.318],'East':[103.955,1.342],'North':[103.80,1.415],'North East':[103.887,1.385],'West':[103.69,1.348],'South':[103.82,1.28]};
+    var SG_AT = {'Central':[103.835,1.318],'East':[103.955,1.342],'North':[103.80,1.415],'North East':[103.887,1.385],'West':[103.70,1.34],'South':[103.81,1.283]};
     var SG_C = [103.847, 1.315];
     var sgPoly = {}; sgGeo.features.forEach(function(f){ sgPoly[f.properties.name] = f; });
     var sgMax = 0; SG_AREAS.forEach(function(k){ sgMax = Math.max(sgMax, COV.sg.areas[k]); });
@@ -874,16 +876,13 @@ window.COVERAGE = {
       ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.fillText('SINGAPORE', x+12, y+16);
       ctx.textAlign = 'right'; ctx.font = '800 13px Poppins, sans-serif'; if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
       ctx.fillStyle = '#F47F20'; ctx.fillText(fmt(COV.sg.total), x+w-12, y+16);
-      SG_AREAS.slice(0,5).forEach(function(nm, i){
+      SG_AREAS.forEach(function(nm, i){
         var f = sgPoly[nm]; if (!f) return;
         var hot = hovered === SG_IDX + 1 + i;
         ctx.beginPath(); sgPath(f);
         ctx.fillStyle = hot ? 'rgba(244,127,32,.85)' : 'rgba(244,127,32,'+(0.22 + 0.55*Math.pow(COV.sg.areas[nm]/sgMax, 1.6))+')'; ctx.fill();
         ctx.strokeStyle = hot ? '#ffffff' : 'rgba(255,255,255,.7)'; ctx.lineWidth = hot ? 1.6 : 0.8; ctx.stroke();
       });
-      var sp = sgProj([SG_AT['South'][0], SG_AT['South'][1]]), sHot = hovered === SG_IDX + 6;
-      ctx.beginPath(); ctx.arc(sp[0], sp[1], sHot ? 4.5 : 3, 0, 6.2832);
-      ctx.fillStyle = sHot ? '#ffffff' : '#F47F20'; ctx.shadowColor = '#F47F20'; ctx.shadowBlur = sHot ? 12 : 6; ctx.fill(); ctx.shadowBlur = 0;
       ctx.restore();
     }
     var myBounds = d3.geoBounds({type:'FeatureCollection', features:malaysia.features});
@@ -1070,7 +1069,7 @@ window.COVERAGE = {
           ctx.strokeStyle = hot ? '#F47F20' : 'rgba(255,255,255,.5)';
           ctx.lineWidth = hot ? 2 : 1; ctx.stroke();
         });
-        SG_AREAS.slice(0,5).forEach(function(nm, i){
+        SG_AREAS.forEach(function(nm, i){
           var f = sgPoly[nm]; if (!f) return;
           var hot = hovered === SG_IDX + 1 + i;
           ctx.beginPath(); path(f);
@@ -1093,13 +1092,8 @@ window.COVERAGE = {
           SG_AREAS.forEach(function(nm, i){
             var p = toScreen(SG_AT[nm][0], SG_AT[nm][1], R, sL0, cL0, lon0r);
             if (p[2] <= 0.05) return;
-            var hot = hovered === SG_IDX + 1 + i, dy = 0;
+            var dy = 0;
             ctx.globalAlpha = s*sgA;
-            if (nm === 'South'){
-              ctx.beginPath(); ctx.arc(p[0], p[1], hot ? 5.5 : 3.5, 0, 6.2832);
-              ctx.fillStyle = hot ? '#ffffff' : '#F47F20'; ctx.shadowColor = '#F47F20'; ctx.shadowBlur = hot ? 14 : 8; ctx.fill(); ctx.shadowBlur = 0;
-              dy = 16;
-            }
             ctx.font = '700 10px Poppins, sans-serif'; if ('letterSpacing' in ctx) ctx.letterSpacing = '1.4px';
             ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.fillText(nm.toUpperCase(), p[0], p[1]-8+dy);
             ctx.font = '800 17px Poppins, sans-serif'; if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
@@ -1179,10 +1173,8 @@ window.COVERAGE = {
       var best = -1, bd = (viewT > 0.5 ? 16 : 11);
       var sgA = sgAlpha();
       if (insetAlpha() > 0.4 && inInset(mx, my)){
-        var sp0 = sgProj([SG_AT['South'][0], SG_AT['South'][1]]);
-        if (Math.hypot(sp0[0]-mx, sp0[1]-my) < 9) return SG_IDX + 6;
         var ll2 = sgProj.invert([mx, my]);
-        if (ll2){ for (var jj=0;jj<5;jj++){ if (pointInFeature(ll2, sgPoly[SG_AREAS[jj]])) return SG_IDX + 1 + jj; } }
+        if (ll2){ for (var jj=0;jj<6;jj++){ if (pointInFeature(ll2, sgPoly[SG_AREAS[jj]])) return SG_IDX + 1 + jj; } }
         return SG_IDX;
       }
       markers.forEach(function(m, idx){
@@ -1194,13 +1186,9 @@ window.COVERAGE = {
       });
       if (best >= 0) return best;
       if (viewT > 0.5){
-        if (sgA > 0.25){
-          var sp = toScreen(SG_AT['South'][0], SG_AT['South'][1], R, sL0, cL0, lon0r);
-          if (sp[2] > 0.05 && Math.hypot(sp[0]-mx, sp[1]-my) < 16) return SG_IDX + 6;
-        }
         var ll = projection.invert([mx, my]);
         if (ll && !isNaN(ll[0])){
-          if (sgA > 0.02){ for (var j=0;j<5;j++){ if (pointInFeature(ll, sgPoly[SG_AREAS[j]])) return SG_IDX + 1 + j; } }
+          if (sgA > 0.02){ for (var j=0;j<6;j++){ if (pointInFeature(ll, sgPoly[SG_AREAS[j]])) return SG_IDX + 1 + j; } }
           for (var i=0;i<malaysia.features.length;i++){ if (pointInFeature(ll, malaysia.features[i])) return i; }
         }
       }

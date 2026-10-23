@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""Builds assets/singapore-regions.geojson (the five Singapore regions drawn on the coverage map).
+"""Builds assets/singapore-regions.geojson (the six Singapore areas drawn on the coverage map).
 
-Source: URA Master Plan 2014 region boundaries (Singapore Open Data Licence, data.gov.sg), as published at
-https://raw.githubusercontent.com/yinshanyang/singapore/master/maps/1-region.geojson
-Download that file, then run from the repo root:
+Step 2 of 2. Step 1 is tools/dissolve-sg-areas.cjs, which joins URA Master Plan 2014 planning areas
+(Singapore Open Data Licence, data.gov.sg) into Troopers' six areas: Central, East, North, North East, South, West.
+South is not an official region; it is made from the southern planning areas (see the SOUTH list in that script).
 
-    python3 tools/make-sg-regions.py path/to/1-region.geojson
+Run from the repo root, with the file step 1 wrote:
+
+    python3 tools/make-sg-regions.py /tmp/sg-six-areas.geojson
 
 The outlines are thinned (Douglas-Peucker, about 30 m) and tiny islets are dropped so the file stays small.
-The government map has five regions (Central, East, North, North East, West). Troopers also counts a sixth
-area, South, which has no outline here; the page shows it as a pin.
 """
 import json
 import os
@@ -17,13 +17,7 @@ import sys
 
 TOL = 0.0003          # degrees, about 33 m
 MIN_AREA = 4e-6       # square degrees, about 0.05 sq km; smaller islets are dropped
-NAMES = {
-    "CENTRAL REGION": "Central",
-    "EAST REGION": "East",
-    "NORTH REGION": "North",
-    "NORTH-EAST REGION": "North East",
-    "WEST REGION": "West",
-}
+ORDER = ["Central", "East", "North", "North East", "West", "South"]
 
 
 def area(ring):
@@ -74,8 +68,8 @@ def thin_ring(ring):
 
 src = json.load(open(sys.argv[1]))
 feats = []
-for f in src["features"]:
-    name = NAMES[f["properties"]["name"]]
+for f in sorted(src["features"], key=lambda f: ORDER.index(f["properties"]["name"])):
+    name = f["properties"]["name"]
     g = f["geometry"]
     polys = [g["coordinates"]] if g["type"] == "Polygon" else g["coordinates"]
     kept = []

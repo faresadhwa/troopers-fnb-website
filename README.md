@@ -9,9 +9,11 @@ index.html                    the whole page: one <style> block, the HTML, then 
 assets/                       photos, client logos and map data referenced by index.html
 assets/world-dots.json        dotted land for the coverage globe (generated, see below)
 assets/malaysia-states.geojson  state outlines for the coverage map
-assets/singapore-regions.geojson  the five Singapore region outlines (generated, see below)
+assets/singapore-regions.geojson  the six Singapore area outlines (generated, see below)
 tools/make-world-dots.py      rebuilds world-dots.json (needs numpy)
-tools/make-sg-regions.py      rebuilds singapore-regions.geojson from the government file
+tools/dissolve-sg-areas.cjs   step 1: joins Singapore's 55 planning areas into the six Troopers areas
+tools/make-sg-regions.py      step 2: thins them into assets/singapore-regions.geojson
+assets/favicon-*.png, apple-touch-icon.png  browser-tab icon: the official TROOPERS "T" mark (from troopers.com.my) on a white tile
 states-map.html               the old stand-alone map page. No longer linked; the map now lives in index.html
 ```
 
@@ -25,7 +27,7 @@ Open `index.html` in a browser, or serve the folder (for example `python3 -m htt
 - Every English string that has a Malay version carries a `data-ms="..."` attribute. Add the Malay text there when you add or change copy.
 - **Coverage numbers** live in one place: the `window.COVERAGE` block near the bottom of `index.html`. Registered and approved talents, pulled 23 Oct 2026 from the Troopers MY and SG connectors. Update the numbers and the "as of" date in the note under the cards (English and `data-ms`). State and area figures are "talents who chose this place as somewhere they will work", so they overlap and add up to more than the totals. Kuala Lumpur, Putrajaya and Labuan are shown as one Federal Territories figure on purpose, because the three are almost always chosen together.
 - **Coverage globe**: intro spin, then three views: South-East Asia close-up ("Region"), a zoomed Singapore map ("Singapore", also reached by clicking the little Singapore inset) and the whole earth ("Globe"). Zoom with the + / − buttons, Ctrl or ⌘ + scroll, or a pinch. Land is dots from `assets/world-dots.json`. If you change `world-land.geojson` or `malaysia-states.geojson`, run `python3 tools/make-world-dots.py` from this folder.
-- **Singapore outlines**: URA Master Plan 2014 regions via data.gov.sg (Singapore Open Data Licence, credited in the note under the cards). The government map has five regions; Troopers also counts **South**, which has no outline, so it is a pin near the south coast (position `SG_AT` in the script). Rebuild with `python3 tools/make-sg-regions.py <path to 1-region.geojson>`; the source URL is in that script.
+- **Singapore outlines**: URA Master Plan 2014 planning areas via data.gov.sg (Singapore Open Data Licence, credited in the note under the cards), joined into Troopers' six areas. The government map has only five regions, so **South is our own cut**: Bukit Merah, Queenstown, Marina South, Straits View and the Southern Islands (Sentosa and friends) are taken out of Central. To change what counts as South, edit the `SOUTH` list in `tools/dissolve-sg-areas.cjs`, then rebuild in two steps (commands are at the top of each tool: `dissolve-sg-areas.cjs` needs `npm i topojson-server topojson-client`, then `make-sg-regions.py`). Label positions are `SG_AT` in the page script.
 - Marquees (client logos, photo band) have two identical sets. If you add or remove an item, do it in **both** sets or the loop will jump.
 - Logos: `logo-troopers.png` and `logo-chagee.png` are the full-colour versions for a light background. The `*-dark.png` and `logo-troopers-white.png` files are left over from the old dark page and are not used now.
 - d3 is pinned to 7.9.0 with an integrity hash. If you change the version, update the hash too.
