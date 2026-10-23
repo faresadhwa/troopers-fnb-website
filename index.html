@@ -130,6 +130,11 @@ body.loaded .hero-anim{animation-play-state:running}
 #viewToggle.ready{opacity:1;pointer-events:auto}
 #viewToggle button{cursor:pointer;border:none;font:inherit;letter-spacing:inherit;border-radius:16px;padding:6px 13px;background:transparent;color:rgba(255,255,255,.7);transition:background .2s ease,color .2s ease}
 #viewToggle button.on{background:var(--orange);color:var(--navy)}
+#zoomCtl{position:absolute;right:16px;bottom:16px;display:flex;flex-direction:column;gap:6px;opacity:0;pointer-events:none;transition:opacity .4s ease;z-index:2}
+#zoomCtl.ready{opacity:1;pointer-events:auto}
+#zoomCtl button{width:36px;height:36px;border:none;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;font-size:20px;line-height:1;cursor:pointer;transition:background .2s ease,color .2s ease,opacity .2s ease}
+#zoomCtl button:hover:not(:disabled){background:var(--orange);color:var(--navy)}
+#zoomCtl button:disabled{opacity:.35;cursor:default}
 #tooltip{position:absolute;pointer-events:none;background:var(--orange);color:var(--navy);font-weight:700;font-size:13px;padding:6px 12px;border-radius:8px;opacity:0;transition:opacity .15s ease;white-space:nowrap;transform:translate(-50%,-130%);z-index:3}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spinner{width:44px;height:44px;border:4px solid rgba(244,127,32,.25);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite}
@@ -367,6 +372,7 @@ body.loaded .hero-anim{animation-play-state:running}
       <div id="tooltip"></div>
       <div id="hint">Finding Malaysia…</div>
       <div id="viewToggle"><button type="button" data-view="region" class="on" data-ms="Kawasan">Region</button><button type="button" data-view="globe" data-ms="Glob">Globe</button></div>
+      <div id="zoomCtl"><button type="button" data-z="in" aria-label="Zoom in">+</button><button type="button" data-z="out" aria-label="Zoom out" disabled>−</button></div>
       <div id="coverageLoading"><div class="spinner"></div><span>Loading map…</span></div>
     </div>
   </div>
@@ -769,6 +775,8 @@ window.COVERAGE = {
     var loading = document.getElementById('coverageLoading');
     var hint = document.getElementById('hint');
     var toggle = document.getElementById('viewToggle');
+    var zoomCtl = document.getElementById('zoomCtl');
+    var zin = zoomCtl.querySelector('[data-z="in"]'), zout = zoomCtl.querySelector('[data-z="out"]');
 
     var malaysia, dotData;
     try {
@@ -877,21 +885,37 @@ window.COVERAGE = {
     var tIntro = 0, anim = null;
     var hovered = -1, interactive = false, visible = false;
     var INTRO_MS = 4200;
+    var zoom = 1, zoomT = 1, ZMAX = 4;   /* extra zoom on top of the Region / Globe view */
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     function ease(t){ return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
     function smooth(t){ return t*t*(3-2*t); }
-    function radius(){ return globeR * Math.pow(regionR/globeR, ease(viewT)); }
+    function radius(){ return globeR * Math.pow(regionR/globeR, ease(viewT)) * zoom; }
     function startAnim(dur, toLon, toLat, toV, onDone){
       var dl = ((toLon - lon + 540) % 360) - 180;
       anim = {t:0, dur:dur, lon0:lon, lat0:lat, dLon:dl, dLat:toLat-lat, v0:viewT, dV:toV-viewT, done:onDone};
-      phase = 'anim';
+      phase = 'anim'; zoomT = 1; syncZoomBtns();
     }
     function goRegion(dur){ startAnim(dur, MY_LON, MY_LAT, 1, function(){ everRegion = true; becomeIdle(); }); }
     function becomeIdle(){
       phase = 'idle'; interactive = true;
-      hint.textContent = viewT > 0.5 ? 'Drag to explore' : 'Drag to spin the globe';
-      toggle.classList.add('ready');
-      setToggle();
+      hint.textContent = hintText();
+      toggle.classList.add('ready'); zoomCtl.classList.add('ready');
+      setToggle(); syncZoomBtns();
+    }
+    function hintText(){
+      return (viewT > 0.5 ? 'Drag to explore' : 'Drag to spin the globe') + (W < 600 ? ' · pinch to zoom' : ' · + / − or Ctrl + scroll to zoom');
+    }
+    function syncZoomBtns(){ zin.disabled = zoomT >= ZMAX - 0.001; zout.disabled = zoomT <= 1.001; }
+    /* instant = wheel / pinch: zooms towards the pointer. Otherwise the + / − buttons ease in towards the centre. */
+    function setZoom(z, ax, ay, instant){
+      z = Math.max(1, Math.min(ZMAX, z));
+      if (instant){
+        var oldR = radius(); zoom = zoomT = z;
+        var newR = radius(), r = newR/oldR;
+        if (ax != null){ var deg = 1/(newR*RAD); lon += (r-1)*(ax - W/2)*deg; lat -= (r-1)*(ay - H/2)*deg; }
+        clampView();
+      } else { zoomT = z; }
+      syncZoomBtns();
     }
     function setToggle(){
       [].forEach.call(toggle.children, function(b){ b.classList.toggle('on', (b.dataset.view==='region') === (viewT > 0.5)); });
@@ -899,6 +923,10 @@ window.COVERAGE = {
     if (reduced){ lon = MY_LON; lat = MY_LAT; viewT = 1; everRegion = true; becomeIdle(); }
 
     function step(dt){
+      if (zoom !== zoomT){
+        zoom += (zoomT - zoom)*(1 - Math.exp(-dt/110));
+        if (Math.abs(zoom - zoomT) < 0.002) zoom = zoomT;
+      }
       if (phase === 'intro'){
         tIntro += dt;
         lon -= 0.053*dt;
@@ -1101,15 +1129,26 @@ window.COVERAGE = {
     });
 
     var dragging = false, moved = false, sx = 0, sy = 0, lon0 = 0, lat0 = 0;
+    var ptrs = {}, pinching = false, pinchD0 = 1, pinchZ0 = 1;
+    function ptrCount(){ return Object.keys(ptrs).length; }
+    function pinchDist(){ var k = Object.keys(ptrs), a = ptrs[k[0]], b = ptrs[k[1]]; return Math.max(1, Math.hypot(a.x-b.x, a.y-b.y)); }
     canvas.addEventListener('pointerdown', function(e){
       if (!interactive) return;
-      dragging = true; moved = false; sx = e.clientX; sy = e.clientY; lon0 = lon; lat0 = lat;
+      ptrs[e.pointerId] = {x:e.clientX, y:e.clientY};
       try{ canvas.setPointerCapture(e.pointerId); }catch(err){}
+      if (ptrCount() === 2){ pinching = true; dragging = false; pinchD0 = pinchDist(); pinchZ0 = zoomT; tip.style.opacity = 0; return; }
+      dragging = true; moved = false; sx = e.clientX; sy = e.clientY; lon0 = lon; lat0 = lat;
     });
     canvas.addEventListener('pointermove', function(e){
       if (!interactive) return;
       var rect = canvas.getBoundingClientRect();
       var mx = e.clientX - rect.left, my = e.clientY - rect.top;
+      if (ptrs[e.pointerId]) ptrs[e.pointerId] = {x:e.clientX, y:e.clientY};
+      if (pinching && ptrCount() === 2){
+        var pk = Object.keys(ptrs), pa = ptrs[pk[0]], pb = ptrs[pk[1]];
+        setZoom(pinchZ0 * pinchDist() / pinchD0, (pa.x+pb.x)/2 - rect.left, (pa.y+pb.y)/2 - rect.top, true);
+        return;
+      }
       if (dragging){
         var dx = e.clientX - sx, dy = e.clientY - sy;
         if (Math.abs(dx)+Math.abs(dy) > 4) moved = true;
@@ -1123,6 +1162,10 @@ window.COVERAGE = {
       }
     });
     function release(e){
+      var wasPinch = pinching;
+      delete ptrs[e.pointerId];
+      if (ptrCount() < 2) pinching = false;
+      if (wasPinch){ dragging = false; return; }
       if (!dragging) return;
       dragging = false;
       if (!moved && e.pointerType !== 'mouse'){
@@ -1133,7 +1176,7 @@ window.COVERAGE = {
       }
     }
     canvas.addEventListener('pointerup', release);
-    canvas.addEventListener('pointercancel', function(){ dragging = false; });
+    canvas.addEventListener('pointercancel', function(e){ delete ptrs[e.pointerId]; if (ptrCount() < 2) pinching = false; dragging = false; });
     canvas.addEventListener('pointerleave', function(e){ if (!dragging && e.pointerType === 'mouse'){ tip.style.opacity = 0; setHover(-1); } });
 
     toggle.addEventListener('click', function(e){
@@ -1144,6 +1187,19 @@ window.COVERAGE = {
       if (toRegion){ startAnim(1300, MY_LON, MY_LAT, 1, function(){ becomeIdle(); }); }
       else { startAnim(1200, lon, lat, 0, function(){ becomeIdle(); }); }
     });
+
+    /* Zoom: + / − buttons, Ctrl or ⌘ + scroll (also a trackpad pinch). Plain scrolling is left alone so the page can still scroll past the map. */
+    zoomCtl.addEventListener('click', function(e){
+      var b = e.target.closest('button'); if (!b || !interactive || b.disabled) return;
+      setZoom(zoomT * (b.dataset.z === 'in' ? 1.6 : 1/1.6), null, null, false);
+    });
+    canvas.addEventListener('wheel', function(e){
+      if (!interactive || !(e.ctrlKey || e.metaKey)) return;
+      e.preventDefault();
+      var rect = canvas.getBoundingClientRect();
+      var f = Math.min(1.25, Math.max(0.8, Math.exp(-e.deltaY*0.01)));
+      setZoom(zoomT * f, e.clientX - rect.left, e.clientY - rect.top, true);
+    }, {passive:false});
 
     var rz;
     window.addEventListener('resize', function(){ clearTimeout(rz); rz = setTimeout(layout, 150); });
