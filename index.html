@@ -162,7 +162,7 @@ body.loaded .hero-anim{animation-play-state:running}
 .sg-sub{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
 .sg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .sg-tile{border-radius:12px;padding:14px 14px 12px;background:rgba(244,127,32,var(--a));border:1px solid rgba(244,127,32,.28);transition:transform .2s ease,box-shadow .2s ease}
-.sg-tile:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(244,127,32,.25)}
+.sg-tile:hover,.sg-tile.active{transform:translateY(-3px);box-shadow:0 10px 22px rgba(244,127,32,.25)}
 .sg-tile span{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink)}
 .sg-tile b{display:block;font-size:22px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums}
 .sg-note{font-size:11.5px;color:var(--muted);margin-top:12px}
@@ -371,7 +371,7 @@ body.loaded .hero-anim{animation-play-state:running}
       <canvas id="globeCanvas"></canvas>
       <div id="tooltip"></div>
       <div id="hint">Finding Malaysia…</div>
-      <div id="viewToggle"><button type="button" data-view="region" class="on" data-ms="Kawasan">Region</button><button type="button" data-view="globe" data-ms="Glob">Globe</button></div>
+      <div id="viewToggle"><button type="button" data-view="region" class="on" data-ms="Kawasan">Region</button><button type="button" data-view="sg" data-ms="Singapura">Singapore</button><button type="button" data-view="globe" data-ms="Glob">Globe</button></div>
       <div id="zoomCtl"><button type="button" data-z="in" aria-label="Zoom in">+</button><button type="button" data-z="out" aria-label="Zoom out" disabled>−</button></div>
       <div id="coverageLoading"><div class="spinner"></div><span>Loading map…</span></div>
     </div>
@@ -381,7 +381,7 @@ body.loaded .hero-anim{animation-play-state:running}
     <div class="reveal"><div id="myCard" class="cov-card"></div></div>
     <div class="reveal"><div id="sgCard" class="cov-card"></div></div>
   </div>
-  <p class="note reveal" data-ms="Talent berdaftar dan diluluskan di platform TROOPERS, setakat 23 Okt 2026. Angka negeri dan kawasan mengira talent yang memilih tempat itu sebagai kawasan kerja mereka, dan seorang talent boleh memilih lebih daripada satu, jadi jumlahnya melebihi jumlah keseluruhan. Wilayah Persekutuan menggabungkan Kuala Lumpur, Putrajaya dan Labuan.">Registered and approved talents on the TROOPERS platform, as of 23 Oct 2026. State and area figures count talents who chose that place as somewhere they will work, and a talent can choose more than one, so they add up to more than the totals. Federal Territories combine Kuala Lumpur, Putrajaya and Labuan.</p>
+  <p class="note reveal" data-ms="Talent berdaftar dan diluluskan di platform TROOPERS, setakat 23 Okt 2026. Angka negeri dan kawasan mengira talent yang memilih tempat itu sebagai kawasan kerja mereka, dan seorang talent boleh memilih lebih daripada satu, jadi jumlahnya melebihi jumlah keseluruhan. Wilayah Persekutuan menggabungkan Kuala Lumpur, Putrajaya dan Labuan. Garis kawasan Singapura: URA Master Plan 2014 melalui data.gov.sg (Singapore Open Data Licence).">Registered and approved talents on the TROOPERS platform, as of 23 Oct 2026. State and area figures count talents who chose that place as somewhere they will work, and a talent can choose more than one, so they add up to more than the totals. Federal Territories combine Kuala Lumpur, Putrajaya and Labuan. Singapore area outlines: URA Master Plan 2014, via data.gov.sg (Singapore Open Data Licence).</p>
 </section>
 
 <section id="calls" class="wrap sec">
@@ -525,7 +525,7 @@ window.COVERAGE = {
   var sg = '<div class="cov-hd orange"><span class="cov-hd-t">Singapore</span><span class="cov-hd-n">'+fmt(C.sg.total)+'<small data-ms="talent berdaftar">registered talents</small></span></div><div class="sg-bd"><div class="sg-sub" data-ms="Mengikut kawasan">By area</div><div class="sg-grid">';
   Object.keys(pos).forEach(function(k){
     var v = C.sg.areas[k], p = pos[k];
-    sg += '<div class="sg-tile" style="grid-column:'+p[0]+';grid-row:'+p[1]+';--a:'+(0.07+0.3*v/sgMax).toFixed(2)+'"><span data-ms="'+p[2]+'">'+k+'</span><b>'+fmt(v)+'</b></div>';
+    sg += '<div class="sg-tile" data-area="'+k+'" style="grid-column:'+p[0]+';grid-row:'+p[1]+';--a:'+(0.07+0.3*v/sgMax).toFixed(2)+'"><span data-ms="'+p[2]+'">'+k+'</span><b>'+fmt(v)+'</b></div>';
   });
   sg += '</div><div class="sg-note" data-ms="Peta jubin kawasan Singapura, bukan mengikut skala.">Tile map of Singapore\'s areas, not to scale.</div></div>';
   document.getElementById('sgCard').innerHTML = sg;
@@ -778,13 +778,14 @@ window.COVERAGE = {
     var zoomCtl = document.getElementById('zoomCtl');
     var zin = zoomCtl.querySelector('[data-z="in"]'), zout = zoomCtl.querySelector('[data-z="out"]');
 
-    var malaysia, dotData;
+    var malaysia, dotData, sgGeo;
     try {
       var res = await Promise.all([
         fetch('./assets/malaysia-states.geojson').then(function(r){ return r.json(); }),
-        fetch('./assets/world-dots.json').then(function(r){ return r.json(); })
+        fetch('./assets/world-dots.json').then(function(r){ return r.json(); }),
+        fetch('./assets/singapore-regions.geojson').then(function(r){ return r.json(); })
       ]);
-      malaysia = res[0]; dotData = res[1];
+      malaysia = res[0]; dotData = res[1]; sgGeo = res[2];
     } catch(e){
       loading.innerHTML = '<span>Could not load the map right now.</span>';
       return;
@@ -844,6 +845,47 @@ window.COVERAGE = {
     });
     var SG_IDX = markers.length;
     markers.push({lng:SG.lng, lat:SG.lat, name:'Singapore', feature:null});
+    /* Singapore: five official region outlines, plus South as a pin (Troopers counts South, the government map has no such region). */
+    var SG_AREAS = ['Central','East','North','North East','West','South'];
+    var SG_AT = {'Central':[103.835,1.318],'East':[103.955,1.342],'North':[103.80,1.415],'North East':[103.887,1.385],'West':[103.69,1.348],'South':[103.82,1.28]};
+    var SG_C = [103.847, 1.315];
+    var sgPoly = {}; sgGeo.features.forEach(function(f){ sgPoly[f.properties.name] = f; });
+    var sgMax = 0; SG_AREAS.forEach(function(k){ sgMax = Math.max(sgMax, COV.sg.areas[k]); });
+    /* Inset: a small Singapore map in the corner, because at region zoom the island is only a few pixels wide. */
+    var sgProj = d3.geoMercator(), sgPath = d3.geoPath(sgProj, ctx), inset = {x:0, y:0, w:0, h:0};
+    function layoutInset(){
+      var narrow = W < 600;
+      inset.w = narrow ? 150 : 230; inset.h = narrow ? 112 : 150; inset.x = 16;
+      inset.y = narrow ? H - inset.h - 58 : H - inset.h - 16;
+      var top = narrow ? 24 : 32;
+      sgProj.fitExtent([[inset.x+10, inset.y+top],[inset.x+inset.w-10, inset.y+inset.h-10]], {type:'FeatureCollection', features:sgGeo.features});
+    }
+    function insetAlpha(){ return smooth(viewT) * (1 - sgAlpha()); }
+    function inInset(mx, my){ return mx >= inset.x && mx <= inset.x+inset.w && my >= inset.y && my <= inset.y+inset.h; }
+    function drawInset(a){
+      if (a < 0.02) return;
+      ctx.save(); ctx.globalAlpha = a;
+      var x = inset.x, y = inset.y, w = inset.w, h = inset.h, r = 12;
+      ctx.beginPath(); ctx.moveTo(x+r, y); ctx.arcTo(x+w, y, x+w, y+h, r); ctx.arcTo(x+w, y+h, x, y+h, r); ctx.arcTo(x, y+h, x, y, r); ctx.arcTo(x, y, x+w, y, r); ctx.closePath();
+      ctx.fillStyle = 'rgba(13,12,56,.88)'; ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,.22)'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+      ctx.font = '700 9.5px Poppins, sans-serif'; if ('letterSpacing' in ctx) ctx.letterSpacing = '1.6px';
+      ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.fillText('SINGAPORE', x+12, y+16);
+      ctx.textAlign = 'right'; ctx.font = '800 13px Poppins, sans-serif'; if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+      ctx.fillStyle = '#F47F20'; ctx.fillText(fmt(COV.sg.total), x+w-12, y+16);
+      SG_AREAS.slice(0,5).forEach(function(nm, i){
+        var f = sgPoly[nm]; if (!f) return;
+        var hot = hovered === SG_IDX + 1 + i;
+        ctx.beginPath(); sgPath(f);
+        ctx.fillStyle = hot ? 'rgba(244,127,32,.85)' : 'rgba(244,127,32,'+(0.22 + 0.55*Math.pow(COV.sg.areas[nm]/sgMax, 1.6))+')'; ctx.fill();
+        ctx.strokeStyle = hot ? '#ffffff' : 'rgba(255,255,255,.7)'; ctx.lineWidth = hot ? 1.6 : 0.8; ctx.stroke();
+      });
+      var sp = sgProj([SG_AT['South'][0], SG_AT['South'][1]]), sHot = hovered === SG_IDX + 6;
+      ctx.beginPath(); ctx.arc(sp[0], sp[1], sHot ? 4.5 : 3, 0, 6.2832);
+      ctx.fillStyle = sHot ? '#ffffff' : '#F47F20'; ctx.shadowColor = '#F47F20'; ctx.shadowBlur = sHot ? 12 : 6; ctx.fill(); ctx.shadowBlur = 0;
+      ctx.restore();
+    }
     var myBounds = d3.geoBounds({type:'FeatureCollection', features:malaysia.features});
     var MY_LON = (myBounds[0][0]+myBounds[1][0])/2, MY_LAT = (myBounds[0][1]+myBounds[1][1])/2;
 
@@ -852,10 +894,10 @@ window.COVERAGE = {
     var graticule = d3.geoGraticule().step([10,10])();
 
     /* ---- layout ---- */
-    var W = 0, H = 0, dpr = 1, globeR = 0, regionR = 0, fineIdx = null, fineSz = 2;
+    var W = 0, H = 0, dpr = 1, globeR = 0, regionR = 0, fineIdx = null, fineSz = 2, zSG = 20, ZMAX = 8;
     function layout(){
       W = Math.max(300, Math.round(wrap.clientWidth));
-      H = W < 600 ? Math.round(W*1.0) : Math.round(Math.min(W*0.5, Math.max(380, window.innerHeight*0.78)));
+      H = W < 600 ? Math.round(W*1.3) : Math.round(Math.min(W*0.5, Math.max(380, window.innerHeight*0.78)));
       dpr = window.devicePixelRatio || 1;
       canvas.width = W*dpr; canvas.height = H*dpr;
       canvas.style.height = H+'px';
@@ -867,6 +909,8 @@ window.COVERAGE = {
       projection.rotate([-MY_LON,-MY_LAT,0]);
       projection.fitExtent([[W*(1-f)/2, H*0.2],[W*(1+f)/2, H*0.8]], {type:'FeatureCollection', features:malaysia.features});
       regionR = projection.scale();
+      zSG = Math.min(0.55*W/(0.482*RAD), 0.7*H/(0.312*RAD)) / regionR;   /* zoom at which the whole island fills the frame */
+      ZMAX = Math.max(8, zSG*1.6);
       projection.translate([W/2, H/2]);
       var pxStep = fine.step * regionR * RAD;
       var k = Math.max(1, Math.round(6.5/pxStep));
@@ -874,6 +918,7 @@ window.COVERAGE = {
       for (var i=0;i<fine.n;i++){ if (fine.r[i]%k===0 && fine.c[i]%k===0) idx.push(i); }
       fineIdx = Int32Array.from(idx);
       fineSz = Math.max(1.3, Math.min(2.6, k*pxStep*0.3));
+      layoutInset();
     }
     layout();
 
@@ -885,15 +930,16 @@ window.COVERAGE = {
     var tIntro = 0, anim = null;
     var hovered = -1, interactive = false, visible = false;
     var INTRO_MS = 4200;
-    var zoom = 1, zoomT = 1, ZMAX = 4;   /* extra zoom on top of the Region / Globe view */
+    var zoom = 1, zoomT = 1;   /* extra zoom on top of the Region / Globe view */
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     function ease(t){ return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
     function smooth(t){ return t*t*(3-2*t); }
     function radius(){ return globeR * Math.pow(regionR/globeR, ease(viewT)) * zoom; }
-    function startAnim(dur, toLon, toLat, toV, onDone){
-      var dl = ((toLon - lon + 540) % 360) - 180;
-      anim = {t:0, dur:dur, lon0:lon, lat0:lat, dLon:dl, dLat:toLat-lat, v0:viewT, dV:toV-viewT, done:onDone};
-      phase = 'anim'; zoomT = 1; syncZoomBtns();
+    function sgAlpha(){ return Math.min(1, Math.max(0, (zoom-8)/8)); }   /* how much of the Singapore close-up (area names, numbers) to show */
+    function startAnim(dur, toLon, toLat, toV, onDone, toZoom){
+      var dl = ((toLon - lon + 540) % 360) - 180, z1 = toZoom || 1;
+      anim = {t:0, dur:dur, lon0:lon, lat0:lat, dLon:dl, dLat:toLat-lat, v0:viewT, dV:toV-viewT, z0:zoom, z1:z1, done:onDone};
+      phase = 'anim'; zoomT = z1; syncZoomBtns();
     }
     function goRegion(dur){ startAnim(dur, MY_LON, MY_LAT, 1, function(){ everRegion = true; becomeIdle(); }); }
     function becomeIdle(){
@@ -905,7 +951,7 @@ window.COVERAGE = {
     function hintText(){
       return (viewT > 0.5 ? 'Drag to explore' : 'Drag to spin the globe') + (W < 600 ? ' · pinch to zoom' : ' · + / − or Ctrl + scroll to zoom');
     }
-    function syncZoomBtns(){ zin.disabled = zoomT >= ZMAX - 0.001; zout.disabled = zoomT <= 1.001; }
+    function syncZoomBtns(){ zin.disabled = zoomT >= ZMAX - 0.001; zout.disabled = zoomT <= 1.001; if (interactive) setToggle(); }
     /* instant = wheel / pinch: zooms towards the pointer. Otherwise the + / − buttons ease in towards the centre. */
     function setZoom(z, ax, ay, instant){
       z = Math.max(1, Math.min(ZMAX, z));
@@ -917,13 +963,15 @@ window.COVERAGE = {
       } else { zoomT = z; }
       syncZoomBtns();
     }
+    function activeView(){ return viewT < 0.5 ? 'globe' : (zoomT >= zSG*0.7 ? 'sg' : 'region'); }
     function setToggle(){
-      [].forEach.call(toggle.children, function(b){ b.classList.toggle('on', (b.dataset.view==='region') === (viewT > 0.5)); });
+      var v = activeView();
+      [].forEach.call(toggle.children, function(b){ b.classList.toggle('on', b.dataset.view === v); });
     }
     if (reduced){ lon = MY_LON; lat = MY_LAT; viewT = 1; everRegion = true; becomeIdle(); }
 
     function step(dt){
-      if (zoom !== zoomT){
+      if (phase !== 'anim' && zoom !== zoomT){
         zoom += (zoomT - zoom)*(1 - Math.exp(-dt/110));
         if (Math.abs(zoom - zoomT) < 0.002) zoom = zoomT;
       }
@@ -936,6 +984,7 @@ window.COVERAGE = {
         anim.t += dt;
         var t = Math.min(1, anim.t/anim.dur), e = ease(t);
         lon = anim.lon0 + anim.dLon*e; lat = anim.lat0 + anim.dLat*e; viewT = anim.v0 + anim.dV*t;
+        zoom = anim.z0 * Math.pow(anim.z1/anim.z0, e);
         if (t >= 1){ var cb = anim.done; anim = null; if (cb) cb(); }
       }
     }
@@ -975,12 +1024,13 @@ window.COVERAGE = {
         ctx.fill();
       }
       /* fine, South-East Asia close-up */
-      if (s > 0.01){
+      var s2 = s * Math.min(1, Math.max(0, 1 - (zoom-4)/6));   /* the neighbouring-land dots fade out as you zoom right in */
+      if (s2 > 0.01){
         var pxdeg = R*RAD;
         var hx = (W/2)/pxdeg*1.1/Math.max(0.3, Math.cos(lat*RAD)) + 1, hy = (H/2)/pxdeg*1.1 + 1;
         for (var pass=0; pass<2; pass++){
           ctx.beginPath();
-          var sz = pass ? fineSz*1.5 : fineSz;
+          var sz = (pass ? fineSz*1.5 : fineSz) * Math.min(2.2, 1 + (zoom-1)*0.12);
           for (var j=0;j<fineIdx.length;j++){
             var q = fineIdx[j];
             if (fine.my[q] !== pass) continue;
@@ -990,7 +1040,7 @@ window.COVERAGE = {
             var X = W/2 + R*fine.cosLat[q]*Math.sin(d2), Y = H/2 - R*(cL0*fine.sinLat[q] - sL0*fine.cosLat[q]*c2);
             ctx.moveTo(X+sz/2, Y); ctx.arc(X, Y, sz/2, 0, 6.2832);
           }
-          ctx.fillStyle = pass ? 'rgba(244,127,32,'+(0.9*s)+')' : 'rgba(176,178,222,'+(0.55*s)+')';
+          ctx.fillStyle = pass ? 'rgba(244,127,32,'+(0.9*s2)+')' : 'rgba(176,178,222,'+(0.55*s2)+')';
           ctx.fill();
         }
       }
@@ -1020,6 +1070,14 @@ window.COVERAGE = {
           ctx.strokeStyle = hot ? '#F47F20' : 'rgba(255,255,255,.5)';
           ctx.lineWidth = hot ? 2 : 1; ctx.stroke();
         });
+        SG_AREAS.slice(0,5).forEach(function(nm, i){
+          var f = sgPoly[nm]; if (!f) return;
+          var hot = hovered === SG_IDX + 1 + i;
+          ctx.beginPath(); path(f);
+          ctx.fillStyle = hot ? 'rgba(244,127,32,.6)' : 'rgba(244,127,32,'+(0.16 + 0.5*Math.pow(COV.sg.areas[nm]/sgMax, 1.6))+')'; ctx.fill();
+          ctx.strokeStyle = hot ? '#F47F20' : 'rgba(255,255,255,.75)';
+          ctx.lineWidth = hot ? 2 : 1; ctx.stroke();
+        });
         ctx.font = '600 10.5px Poppins, sans-serif';
         ctx.textBaseline = 'middle';
         if ('letterSpacing' in ctx) ctx.letterSpacing = '1.6px';
@@ -1029,6 +1087,25 @@ window.COVERAGE = {
           var w = ctx.measureText(L[0]).width;
           if (p[2] > 0.05 && p[0]-w/2 > 6 && p[0]+w/2 < W-6 && p[1] > 8 && p[1] < H-8){ ctx.textAlign = 'center'; ctx.fillText(L[0], p[0], p[1]); }
         });
+        var sgA = sgAlpha();
+        if (sgA > 0.02){
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          SG_AREAS.forEach(function(nm, i){
+            var p = toScreen(SG_AT[nm][0], SG_AT[nm][1], R, sL0, cL0, lon0r);
+            if (p[2] <= 0.05) return;
+            var hot = hovered === SG_IDX + 1 + i, dy = 0;
+            ctx.globalAlpha = s*sgA;
+            if (nm === 'South'){
+              ctx.beginPath(); ctx.arc(p[0], p[1], hot ? 5.5 : 3.5, 0, 6.2832);
+              ctx.fillStyle = hot ? '#ffffff' : '#F47F20'; ctx.shadowColor = '#F47F20'; ctx.shadowBlur = hot ? 14 : 8; ctx.fill(); ctx.shadowBlur = 0;
+              dy = 16;
+            }
+            ctx.font = '700 10px Poppins, sans-serif'; if ('letterSpacing' in ctx) ctx.letterSpacing = '1.4px';
+            ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.fillText(nm.toUpperCase(), p[0], p[1]-8+dy);
+            ctx.font = '800 17px Poppins, sans-serif'; if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+            ctx.fillStyle = '#ffffff'; ctx.fillText(fmt(COV.sg.areas[nm]), p[0], p[1]+10+dy);
+          });
+        }
         ctx.globalAlpha = 1;
       }
 
@@ -1039,7 +1116,10 @@ window.COVERAGE = {
         markers.forEach(function(m, idx){
           var p = toScreen(m.lng, m.lat, R, sL0, cL0, lon0r);
           if (p[2] <= 0.05) return;
-          var isHot = idx === hovered;
+          var pa = idx === SG_IDX ? 1 - sgAlpha() : 1;   /* the single Singapore pin gives way to the area labels */
+          if (pa < 0.02) return;
+          ctx.globalAlpha = pinA * pa;
+          var isHot = idx === hovered || (idx === SG_IDX && hovered > SG_IDX);
           var pulse = ((now*0.001 + idx*0.35) % 1.6) / 1.6;
           ctx.beginPath(); ctx.arc(p[0], p[1], (4 + pulse*13)*sf, 0, 2*Math.PI);
           ctx.strokeStyle = 'rgba(244,127,32,'+((1-pulse)*0.55)+')'; ctx.lineWidth = 1.5; ctx.stroke();
@@ -1055,6 +1135,7 @@ window.COVERAGE = {
         });
         ctx.globalAlpha = 1;
       }
+      drawInset(s * (1 - sgAlpha()));
     }
 
     var last = performance.now();
@@ -1076,6 +1157,7 @@ window.COVERAGE = {
     /* ---- hovering, dragging, cards ---- */
     var rows = [].slice.call(document.querySelectorAll('#myCard .st'));
     var sgCard = document.getElementById('sgCard');
+    var sgTiles = [].slice.call(sgCard.querySelectorAll('.sg-tile'));
     function setHover(idx){
       if (idx === hovered) return;
       hovered = idx;
@@ -1083,9 +1165,11 @@ window.COVERAGE = {
         var on = idx >= 0 && idx < SG_IDX && r.dataset.names.split('|').indexOf(markers[idx].name) >= 0;
         r.classList.toggle('active', on);
       });
-      sgCard.classList.toggle('hot', idx === SG_IDX);
+      sgCard.classList.toggle('hot', idx >= SG_IDX);
+      sgTiles.forEach(function(t){ t.classList.toggle('active', idx > SG_IDX && SG_AREAS[idx - SG_IDX - 1] === t.dataset.area); });
     }
     function labelFor(idx){
+      if (idx > SG_IDX){ var nm = SG_AREAS[idx - SG_IDX - 1]; return 'Singapore ' + nm + ' · ' + fmt(COV.sg.areas[nm]) + ' talents'; }
       if (idx === SG_IDX) return 'Singapore · '+fmt(COV.sg.total)+' talents';
       var i = info(markers[idx].name);
       return i.label+' · '+fmt(i.value)+' talents';
@@ -1093,7 +1177,16 @@ window.COVERAGE = {
     function hit(mx, my){
       var R = radius(), sL0 = Math.sin(lat*RAD), cL0 = Math.cos(lat*RAD), lon0r = lon*RAD;
       var best = -1, bd = (viewT > 0.5 ? 16 : 11);
+      var sgA = sgAlpha();
+      if (insetAlpha() > 0.4 && inInset(mx, my)){
+        var sp0 = sgProj([SG_AT['South'][0], SG_AT['South'][1]]);
+        if (Math.hypot(sp0[0]-mx, sp0[1]-my) < 9) return SG_IDX + 6;
+        var ll2 = sgProj.invert([mx, my]);
+        if (ll2){ for (var jj=0;jj<5;jj++){ if (pointInFeature(ll2, sgPoly[SG_AREAS[jj]])) return SG_IDX + 1 + jj; } }
+        return SG_IDX;
+      }
       markers.forEach(function(m, idx){
+        if (idx === SG_IDX && sgA > 0.25) return;
         var p = toScreen(m.lng, m.lat, R, sL0, cL0, lon0r);
         if (p[2] <= 0.05) return;
         var d = Math.hypot(p[0]-mx, p[1]-my);
@@ -1101,8 +1194,13 @@ window.COVERAGE = {
       });
       if (best >= 0) return best;
       if (viewT > 0.5){
+        if (sgA > 0.25){
+          var sp = toScreen(SG_AT['South'][0], SG_AT['South'][1], R, sL0, cL0, lon0r);
+          if (sp[2] > 0.05 && Math.hypot(sp[0]-mx, sp[1]-my) < 16) return SG_IDX + 6;
+        }
         var ll = projection.invert([mx, my]);
         if (ll && !isNaN(ll[0])){
+          if (sgA > 0.02){ for (var j=0;j<5;j++){ if (pointInFeature(ll, sgPoly[SG_AREAS[j]])) return SG_IDX + 1 + j; } }
           for (var i=0;i<malaysia.features.length;i++){ if (pointInFeature(ll, malaysia.features[i])) return i; }
         }
       }
@@ -1111,8 +1209,13 @@ window.COVERAGE = {
     function showTip(idx, mx, my){
       if (idx < 0){ tip.style.opacity = 0; return; }
       tip.textContent = labelFor(idx);
-      tip.style.left = Math.max(60, Math.min(W-60, mx)) + 'px';
-      tip.style.top = my + 'px';
+      if (insetAlpha() > 0.4 && inInset(mx, my)){   /* keep the label beside the inset so it does not cover the island */
+        tip.style.left = Math.min(W - tip.offsetWidth/2 - 8, inset.x + inset.w + 12 + tip.offsetWidth/2) + 'px';
+        tip.style.top = (inset.y + 42) + 'px';
+      } else {
+        tip.style.left = Math.max(60, Math.min(W-60, mx)) + 'px';
+        tip.style.top = my + 'px';
+      }
       tip.style.opacity = 1;
     }
 
@@ -1124,16 +1227,18 @@ window.COVERAGE = {
       r.addEventListener('mouseleave', function(){ setHover(-1); });
     });
     [].forEach.call(sgCard.querySelectorAll('.sg-tile'), function(t){
-      t.addEventListener('mouseenter', function(){ setHover(SG_IDX); });
+      t.addEventListener('mouseenter', function(){ setHover(SG_IDX + 1 + SG_AREAS.indexOf(t.dataset.area)); });
       t.addEventListener('mouseleave', function(){ setHover(-1); });
     });
 
     var dragging = false, moved = false, sx = 0, sy = 0, lon0 = 0, lat0 = 0;
-    var ptrs = {}, pinching = false, pinchD0 = 1, pinchZ0 = 1;
+    var ptrs = {}, pinching = false, pinchD0 = 1, pinchZ0 = 1, insetPress = false;
     function ptrCount(){ return Object.keys(ptrs).length; }
     function pinchDist(){ var k = Object.keys(ptrs), a = ptrs[k[0]], b = ptrs[k[1]]; return Math.max(1, Math.hypot(a.x-b.x, a.y-b.y)); }
     canvas.addEventListener('pointerdown', function(e){
       if (!interactive) return;
+      var r0 = canvas.getBoundingClientRect();
+      if (insetAlpha() > 0.4 && inInset(e.clientX - r0.left, e.clientY - r0.top)){ insetPress = true; return; }
       ptrs[e.pointerId] = {x:e.clientX, y:e.clientY};
       try{ canvas.setPointerCapture(e.pointerId); }catch(err){}
       if (ptrCount() === 2){ pinching = true; dragging = false; pinchD0 = pinchDist(); pinchZ0 = zoomT; tip.style.opacity = 0; return; }
@@ -1159,9 +1264,16 @@ window.COVERAGE = {
       } else if (e.pointerType === 'mouse'){
         var idx = hit(mx, my);
         setHover(idx); showTip(idx, mx, my);
+        canvas.style.cursor = (insetAlpha() > 0.4 && inInset(mx, my)) ? 'pointer' : '';
       }
     });
     function release(e){
+      if (insetPress){
+        insetPress = false;
+        var r1 = canvas.getBoundingClientRect();
+        if (insetAlpha() > 0.4 && inInset(e.clientX - r1.left, e.clientY - r1.top)) goView('sg');
+        return;
+      }
       var wasPinch = pinching;
       delete ptrs[e.pointerId];
       if (ptrCount() < 2) pinching = false;
@@ -1176,17 +1288,20 @@ window.COVERAGE = {
       }
     }
     canvas.addEventListener('pointerup', release);
-    canvas.addEventListener('pointercancel', function(e){ delete ptrs[e.pointerId]; if (ptrCount() < 2) pinching = false; dragging = false; });
+    canvas.addEventListener('pointercancel', function(e){ insetPress = false; delete ptrs[e.pointerId]; if (ptrCount() < 2) pinching = false; dragging = false; });
     canvas.addEventListener('pointerleave', function(e){ if (!dragging && e.pointerType === 'mouse'){ tip.style.opacity = 0; setHover(-1); } });
 
     toggle.addEventListener('click', function(e){
       var b = e.target.closest('button'); if (!b || !interactive) return;
-      var toRegion = b.dataset.view === 'region';
-      if (toRegion === (viewT > 0.5)) return;
-      interactive = false; tip.style.opacity = 0; setHover(-1);
-      if (toRegion){ startAnim(1300, MY_LON, MY_LAT, 1, function(){ becomeIdle(); }); }
-      else { startAnim(1200, lon, lat, 0, function(){ becomeIdle(); }); }
+      goView(b.dataset.view);
     });
+    function goView(v){
+      if (!interactive || v === activeView()) return;
+      interactive = false; tip.style.opacity = 0; setHover(-1); canvas.style.cursor = '';
+      if (v === 'region') startAnim(1300, MY_LON, MY_LAT, 1, function(){ becomeIdle(); }, 1);
+      else if (v === 'sg') startAnim(1800, SG_C[0], SG_C[1], 1, function(){ becomeIdle(); }, zSG);
+      else startAnim(1200, lon, lat, 0, function(){ becomeIdle(); }, 1);
+    }
 
     /* Zoom: + / − buttons, Ctrl or ⌘ + scroll (also a trackpad pinch). Plain scrolling is left alone so the page can still scroll past the map. */
     zoomCtl.addEventListener('click', function(e){
