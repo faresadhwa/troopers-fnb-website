@@ -212,7 +212,7 @@ body.loaded .hero-anim{animation-play-state:running}
   .hero-media{height:clamp(340px,52vh,520px)}
   .hero-card-wrap{margin-top:-70px}
   .hero-card{padding:28px 24px 26px;border-radius:18px}
-  .wrap{padding:0 18px}
+  .wrap{padding-left:18px;padding-right:18px}   /* sides only: the shorthand used to wipe the top/bottom padding of .sec, .ft and .ft-bottom on phones */
   #headerInner{padding:12px 18px;gap:10px 12px}
   #siteHeader.shrink #headerInner{padding-top:8px;padding-bottom:8px}
   .hdr-right{display:contents}
@@ -670,13 +670,17 @@ window.COVERAGE = {
   var floatCta = document.getElementById('floatCta');
   var heroSection = document.getElementById('heroSection');
   var finalCta = document.getElementById('finalcta');
+  var mapPanel = document.querySelector('.globe-panel');
   if(!floatCta || !heroSection) return;
   var visible = false;
   function update(){
     var heroBottom = heroSection.getBoundingClientRect().bottom;
     var pastHero = heroBottom < 0;
     var nearFinal = finalCta && finalCta.getBoundingClientRect().top < window.innerHeight;
-    var should = pastHero && !nearFinal;
+    /* on a phone the button would sit on top of the map's zoom buttons, so it steps aside while the map is on screen */
+    var mr = mapPanel ? mapPanel.getBoundingClientRect() : null;
+    var overMap = !!mr && window.innerWidth < 760 && mr.top < window.innerHeight && mr.bottom > 0;
+    var should = pastHero && !nearFinal && !overMap;
     if(should !== visible){ visible = should; floatCta.classList.toggle('show', visible); }
   }
   window.addEventListener('scroll', update, {passive:true});
@@ -871,7 +875,8 @@ window.COVERAGE = {
       projection.rotate([-MY_LON,-MY_LAT,0]);
       projection.fitExtent([[W*(1-f)/2, H*0.2],[W*(1+f)/2, H*0.8]], {type:'FeatureCollection', features:malaysia.features});
       regionR = projection.scale();
-      zSG = Math.min(0.55*W/(0.482*RAD), 0.7*H/(0.312*RAD)) / regionR;   /* zoom at which the whole island fills the frame */
+      /* zoom at which the whole island fills the frame; on a phone it takes nearly the full width so the six area labels have room */
+      zSG = Math.min((W < 600 ? 0.92 : 0.55)*W/(0.482*RAD), 0.7*H/(0.312*RAD)) / regionR;
       ZMAX = Math.max(8, zSG*1.6);
       projection.translate([W/2, H/2]);
       var pxStep = fine.step * regionR * RAD;
@@ -1055,12 +1060,14 @@ window.COVERAGE = {
           SG_AREAS.forEach(function(nm, i){
             var p = toScreen(SG_AT[nm][0], SG_AT[nm][1], R, sL0, cL0, lon0r);
             if (p[2] <= 0.05) return;
-            var dy = 0;
+            var dy = 0, nar = W < 600;   /* smaller, tighter labels on a phone so neighbouring areas do not run into each other */
             ctx.globalAlpha = s*sgA;
-            ctx.font = '700 10px Poppins, sans-serif'; if ('letterSpacing' in ctx) ctx.letterSpacing = '1.4px';
-            ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.fillText(nm.toUpperCase(), p[0], p[1]-8+dy);
-            ctx.font = '800 17px Poppins, sans-serif'; if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
-            ctx.fillStyle = '#ffffff'; ctx.fillText(fmt(COV.sg.areas[nm]), p[0], p[1]+10+dy);
+            if (nar){ ctx.shadowColor = 'rgba(13,12,56,.95)'; ctx.shadowBlur = 4; }   /* dark halo so the text stays readable where it crosses an area border */
+            ctx.font = '700 '+(nar ? 8 : 10)+'px Poppins, sans-serif'; if ('letterSpacing' in ctx) ctx.letterSpacing = (nar ? '0.8px' : '1.4px');
+            ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.fillText(nm.toUpperCase(), p[0], p[1]-(nar ? 6 : 8)+dy);
+            ctx.font = '800 '+(nar ? 14 : 17)+'px Poppins, sans-serif'; if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+            ctx.fillStyle = '#ffffff'; ctx.fillText(fmt(COV.sg.areas[nm]), p[0], p[1]+(nar ? 7 : 10)+dy);
+            ctx.shadowBlur = 0;
           });
         }
         ctx.globalAlpha = 1;
