@@ -1,6 +1,6 @@
 # TROOPERS — F&B Staffing page
 
-Static HTML. No build step. Look follows the MyBurgerLab business deck (cream page, navy text, orange for emphasis).
+Static HTML. No build step. Content follows the MyBurgerLab business site; the look follows the TROOPERS Branding Guideline 2026, B2B "Clean White Gradient" (white page, navy headlines with an orange key phrase and a short orange bar, pill-shaped orange buttons, rounded-lines motif).
 
 ## Files
 
@@ -22,6 +22,10 @@ states-map.html               the old stand-alone map page. No longer linked; th
 Open `index.html` in a browser, or serve the folder (for example `python3 -m http.server 8820`). The coverage map loads JSON files, so it needs a server, not a double-click on the file.
 
 ## Editing notes
+
+- **Rates are hidden on purpose.** The rate table and the cost calculator sit inside one closed block (`details.rates`, button "Show rates") because the rates can change. No rate numbers appear anywhere else on the page. When rates change, edit the rows in `#cost` and the defaults in the calculator script at the bottom of `index.html` (service fee `rp_sf`, SST 8%).
+- **Product screens** (`assets/screen-*.webp`) are sample screens with dummy people and data, made for the web. The ten feature buttons in `#platform` switch between them.
+- **Topic blocks** are full-width white-to-grey gradients; every second block runs the other way (ids listed in the CSS next to `.sec::before`) so the joins match. New topic = add a `<section class="wrap sec">` and, if it is an even block, add its id to that list.
 
 - Colours are CSS variables at the top of the `<style>` block (`--navy`, `--orange`, `--cream`, and so on). Font is Poppins from Google Fonts.
 - The page is English only (the Malay version and language switch were removed on purpose). Keep the wording plain: short sentences, no industry jargon, and never promise same-day staffing (job posts are checked within 3 working days).
