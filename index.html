@@ -4,7 +4,8 @@
 <script>if('scrollRestoration' in history){ history.scrollRestoration = 'manual'; } window.scrollTo(0,0);</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TROOPERS — F&amp;B Staffing</title>
+<title>TROOPERS | Part-time crew for F&amp;B</title>
+<meta name="description" content="Post a shift and pick your own part-timers. Everyone is ID-checked and rated, and we handle the paperwork. Free to sign up.">
 <link rel="icon" type="image/png" sizes="128x128" href="./assets/favicon-128.png">
 <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png">
 <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
@@ -401,9 +402,235 @@ body.loaded .hero-anim{animation-play-state:running}
   .st{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:10px}
 }
 @media(prefers-reduced-motion:reduce){.marq-track,.band-track{animation:none}.reveal{transition:none}}
+
+
+/* ================= 2026-11-23 hook rebuild: shorter page for F&B owners ================= */
+/* the two blocks that now run the other way round, so every join between blocks keeps one colour */
+#how::before,#cost::before{background:linear-gradient(180deg,#E6E8F0 0%,#FFFFFF 100%)}
+#how,#why,#coverage,#cost,#faq{scroll-margin-top:64px}
+
+/* ---------- hero: headline + phone showing the real flow ---------- */
+#heroSection{position:relative;overflow:hidden;background:linear-gradient(180deg,#FFFFFF 0%,#F3F4F9 100%)}
+.hero2{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:clamp(24px,4vw,80px);align-items:center;padding-top:clamp(32px,5vh,64px);padding-bottom:clamp(40px,6vh,72px);min-height:min(760px,calc(100svh - 62px))}
+.hero2-copy{position:relative;z-index:2}
+.h1x{font-size:clamp(40px,5.5vw,80px);line-height:.98;font-weight:700;letter-spacing:-.045em;margin-top:8px;color:var(--navy)}
+.h1x span{display:inline-block}
+.h1x .hl{display:block}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.h1x::after{content:'';display:block;width:64px;height:5px;border-radius:3px;background:var(--orange);margin-top:24px}
+.hero2 .hero-p{font-size:clamp(15px,1.3vw,18px);line-height:1.6;color:var(--muted);max-width:29em;margin-top:22px}
+.hero2 .hero-btns{margin-top:28px}
+.hero2 .hero-btns .btn{padding:15px 30px;font-size:14px}
+.hero2 .hero-btns .btn-line{padding:13px 28px}
+.ticks{list-style:none;margin:30px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:12px 26px}
+.ticks li{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;color:var(--navy)}
+.ticks li::before{content:'';flex:none;width:20px;height:20px;border-radius:50%;background:var(--orange) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 10.5l3 3 6-6.5'/%3E%3C/svg%3E") center/12px no-repeat}
+
+.hero2-art{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.arches{position:absolute;z-index:0;left:50%;top:50%;width:min(560px,118%);aspect-ratio:1;transform:translate(-50%,-50%);background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' fill='none' stroke='%23C3C8D8' stroke-width='1.1'%3E%3Crect x='3' y='3' width='194' height='194' rx='76'/%3E%3Crect x='32' y='32' width='136' height='136' rx='54'/%3E%3Crect x='60' y='60' width='80' height='80' rx='32'/%3E%3C/svg%3E") center/contain no-repeat;opacity:.9;pointer-events:none}
+.phone{position:relative;z-index:1;width:296px;height:600px;border-radius:48px;background:var(--navy);padding:10px;box-shadow:0 60px 90px -36px rgba(19,18,73,.6),0 22px 40px -22px rgba(19,18,73,.4)}
+.ph-screen{position:relative;width:100%;height:100%;border-radius:39px;background:#F4F5FA;overflow:hidden}
+.ph-notch{position:absolute;z-index:4;top:0;left:50%;transform:translateX(-50%);width:92px;height:23px;background:var(--navy);border-radius:0 0 15px 15px}
+.ph-top{position:relative;z-index:3;background:#fff;padding:36px 18px 12px;border-bottom:1px solid var(--grey-mid)}
+.ph-brand{display:flex;align-items:center;justify-content:space-between}
+.ph-brand img{height:15px;width:auto}
+.ph-brand span{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2)}
+.ph-step{font-size:15px;font-weight:700;margin-top:10px;letter-spacing:-.01em;transition:opacity .25s ease}
+.ph-dots{display:flex;gap:5px;margin-top:9px}
+.ph-dots i{flex:1;height:3px;border-radius:2px;background:var(--grey-mid);transition:background .4s ease}
+.phone[data-s="1"] .ph-dots i:nth-child(-n+1),.phone[data-s="2"] .ph-dots i:nth-child(-n+2),.phone[data-s="3"] .ph-dots i:nth-child(-n+3),.phone[data-s="4"] .ph-dots i{background:var(--orange)}
+.ph-body{position:absolute;left:0;right:0;top:112px;bottom:0}
+.sc{position:absolute;inset:0;padding:16px 16px 0;opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease;pointer-events:none}
+.phone[data-s="1"] .s1,.phone[data-s="2"] .s2,.phone[data-s="3"] .s3,.phone[data-s="4"] .s3{opacity:1;transform:none}
+
+.f-card{background:#fff;border:1px solid var(--grey-mid);border-radius:13px;padding:10px 13px;margin-bottom:10px}
+.f-card label{display:block;font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2)}
+.f-val{font-size:14px;font-weight:700;margin-top:3px;line-height:1.25}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.f-step{display:flex;align-items:center;gap:12px;margin-top:3px}
+.f-step i{font-style:normal;width:24px;height:24px;border-radius:50%;background:var(--grey);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--navy)}
+.f-step b{font-size:16px;font-weight:700;min-width:12px;text-align:center}
+.f-btn{display:block;width:100%;margin-top:6px;border:none;border-radius:999px;padding:13px;background:linear-gradient(90deg,#F47F20,#F48830);color:#fff;font:inherit;font-size:13.5px;font-weight:700;transition:transform .2s ease,box-shadow .2s ease}
+.phone.tap .f-btn{transform:scale(.95);box-shadow:0 0 0 7px rgba(244,127,32,.22)}
+.s1 .f-note{font-size:11px;line-height:1.5;color:var(--muted);margin-top:12px;text-align:center}
+
+.chk{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:62px}
+.chk svg{width:74px;height:74px}
+.chk circle{fill:none;stroke:var(--orange);stroke-width:3;stroke-dasharray:226;stroke-dashoffset:226}
+.chk path{fill:none;stroke:var(--orange);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:50;stroke-dashoffset:50}
+.phone[data-s="2"] .chk circle{animation:draw .6s .1s ease forwards}
+.phone[data-s="2"] .chk path{animation:draw .4s .55s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.chk b{font-size:17px;margin-top:20px;letter-spacing:-.01em}
+.chk p{font-size:12px;line-height:1.55;color:var(--muted);margin-top:8px;max-width:19em}
+
+.ap-h{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px}
+.ap-h b{font-size:13px}
+.ap-h small{font-size:11px;color:var(--muted);white-space:nowrap}
+.ap{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--grey-mid);border-radius:14px;padding:9px 11px;margin-bottom:8px;opacity:0;transform:translateX(26px)}
+.phone[data-s="3"] .ap,.phone[data-s="4"] .ap{opacity:1;transform:none;transition:opacity .45s ease,transform .45s cubic-bezier(.22,1,.36,1);transition-delay:calc(var(--i) * .5s + .25s)}
+.phone:not([data-s="3"]):not([data-s="4"]) .ap{transition:none}
+.av{flex:none;width:44px;height:44px;border-radius:50%;overflow:hidden;background:var(--grey);border:2px solid #fff;box-shadow:0 0 0 1px var(--grey-mid)}
+.av img{width:100%;height:100%;object-fit:cover;object-position:var(--x) var(--y);transform:scale(var(--z,1));transform-origin:var(--x) var(--y)}
+.ap-m{min-width:0;flex:1}
+.ap-m b{display:block;font-size:12.5px;line-height:1.2}
+.ap-m small{display:block;font-size:10.5px;color:var(--muted);margin-top:2px}
+.ap-m small em{font-style:normal;color:var(--orange);font-weight:700}
+.tags{display:flex;gap:4px;margin-top:5px}
+.tags u{text-decoration:none;font-size:8.5px;font-weight:700;letter-spacing:.02em;color:#1B7A4B;background:#E4F5EC;border-radius:5px;padding:2px 5px;white-space:nowrap}
+.hire{text-align:center;position:relative;flex:none;border:1.5px solid var(--navy);background:#fff;color:var(--navy);border-radius:999px;font:inherit;font-size:11px;font-weight:700;padding:7px 0;width:56px;overflow:hidden;transition:background .3s ease,color .3s ease,border-color .3s ease}
+.hire span{display:block;transition:opacity .25s ease,transform .25s ease}
+.hire .h2{position:absolute;left:0;right:0;top:50%;transform:translateY(calc(-50% + 10px));opacity:0}
+.phone[data-s="4"] .pick .hire{background:var(--orange);border-color:var(--orange);color:#fff;transition-delay:calc(var(--i) * .45s)}
+.phone[data-s="4"] .pick .hire .h1{opacity:0;transform:translateY(-10px);transition-delay:calc(var(--i) * .45s)}
+.phone[data-s="4"] .pick .hire .h2{opacity:1;transform:translateY(-50%);transition-delay:calc(var(--i) * .45s)}
+.done{position:absolute;left:16px;right:16px;bottom:18px;background:var(--navy);color:#fff;border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600;opacity:0;transform:translateY(14px);transition:opacity .4s ease,transform .4s ease}
+.done b{color:var(--orange);font-size:13px}
+.phone[data-s="4"] .done{opacity:1;transform:none;transition-delay:1.5s}
+.ph-cap{position:relative;z-index:2;margin-top:16px;font-size:11px;color:var(--muted2);text-align:center}
+
+/* ---------- three headaches ---------- */
+.why3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:36px}
+@media(max-width:900px){.why3{grid-template-columns:1fr}}
+.why-wrap{display:flex}
+.why{flex:1;background:#fff;border:1px solid var(--grey-mid);border-radius:18px;padding:26px 24px 28px}
+.why i{display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:50%;background:var(--navy);color:#fff;margin-bottom:20px}
+.why i svg{width:21px;height:21px}
+.why h3{font-size:clamp(17px,1.5vw,21px);font-weight:700;letter-spacing:-.02em;line-height:1.2}
+.why p{font-size:14px;line-height:1.65;color:var(--muted);margin-top:10px}
+.why:nth-child(1){}
+.why-wrap:nth-child(2) .why{background:var(--navy);border-color:var(--navy);color:#fff}
+.why-wrap:nth-child(2) .why i{background:var(--orange);color:var(--navy)}
+.why-wrap:nth-child(2) .why p{color:rgba(255,255,255,.82)}
+
+/* ---------- 3 steps ---------- */
+.steps.s3{grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:900px){.steps.s3{grid-template-columns:1fr}}
+.steps.s3 .step{padding:24px 24px 26px;border-radius:18px}
+.steps.s3 .step-n{width:40px;height:40px;font-size:16px}
+.steps.s3 .step h3{font-size:19px;margin-top:16px}
+.steps.s3 .step p{font-size:14px;line-height:1.65;margin-top:8px}
+.steps.s3 .step small{display:block;font-size:12px;line-height:1.55;color:var(--muted2);margin-top:10px;padding-top:10px;border-top:1px solid var(--grey-mid)}
+
+/* ---------- part-timers near you (finder) ---------- */
+.finder{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);margin-top:30px;border-radius:22px;overflow:hidden;border:1px solid var(--grey-mid);background:#fff;box-shadow:0 30px 60px -34px rgba(19,18,73,.35)}
+@media(max-width:900px){.finder{grid-template-columns:1fr}}
+.fd-form{padding:28px 30px 30px;display:flex;flex-direction:column;justify-content:center}
+.fd-q{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.fd-q label{font:inherit;letter-spacing:inherit;text-transform:inherit}
+.fd-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+.fd-chips button{cursor:pointer;border:1.5px solid var(--grey-mid);background:#fff;color:var(--navy);border-radius:999px;padding:9px 15px;font:inherit;font-size:12.5px;font-weight:600;transition:background .2s ease,border-color .2s ease,color .2s ease,transform .2s ease}
+.fd-chips button:hover{border-color:var(--navy)}
+.fd-chips button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.fd-row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px 34px;align-items:start}
+@media(max-width:560px){.fd-row{grid-template-columns:1fr}}
+.fd-step{display:flex;align-items:center;gap:14px}
+.fd-step button{cursor:pointer;width:42px;height:42px;border-radius:50%;border:1.5px solid var(--grey-mid);background:#fff;font:inherit;font-size:20px;font-weight:600;color:var(--navy);transition:border-color .2s ease,background .2s ease}
+.fd-step button:hover{border-color:var(--navy);background:var(--grey)}
+.fd-step b{font-size:26px;font-weight:700;min-width:34px;text-align:center;font-variant-numeric:tabular-nums}
+.fd-sel{width:100%;appearance:none;-webkit-appearance:none;border:1.5px solid var(--grey-mid);border-radius:14px;padding:12px 40px 12px 16px;font:inherit;font-size:14px;font-weight:600;color:var(--navy);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23131249' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 8l5 5 5-5'/%3E%3C/svg%3E") right 14px center/16px no-repeat;cursor:pointer;min-height:44px}
+.fd-sel:focus-visible,.fd-chips button:focus-visible,.fd-step button:focus-visible{outline:3px solid rgba(244,127,32,.5);outline-offset:2px}
+.fd-out{position:relative;overflow:hidden;isolation:isolate;background:var(--navy);color:#fff;padding:28px 30px 30px;display:flex;flex-direction:column}
+.fd-out::after{content:'';position:absolute;z-index:-1;right:-60px;bottom:-90px;width:300px;height:300px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' fill='none' stroke='%23F47F20' stroke-opacity='.45' stroke-width='1.2'%3E%3Crect x='3' y='3' width='194' height='194' rx='76'/%3E%3Crect x='32' y='32' width='136' height='136' rx='54'/%3E%3Crect x='60' y='60' width='80' height='80' rx='32'/%3E%3C/svg%3E") center/contain no-repeat}
+.fd-k{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+.fd-where{font-size:clamp(18px,1.7vw,24px);font-weight:700;letter-spacing:-.02em;margin-top:6px}
+.fd-num{font-size:clamp(52px,6vw,84px);font-weight:800;letter-spacing:-.045em;line-height:1;color:var(--orange);margin-top:14px;font-variant-numeric:tabular-nums}
+.fd-p{font-size:14px;line-height:1.6;color:rgba(255,255,255,.86);margin-top:14px;max-width:26em}
+.fd-out .btn{align-self:flex-start;margin-top:22px;padding:14px 28px}
+.fd-fine{font-size:11.5px;line-height:1.55;color:rgba(255,255,255,.62);margin-top:16px;max-width:30em}
+.cov-head+.finder+.globe-panel{margin-top:22px}
+.morenums{margin-top:22px}
+.morenums summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:10px;padding:12px 22px;border-radius:999px;border:2px solid var(--navy);font-size:13px;font-weight:700;color:var(--navy);transition:background .2s ease,color .2s ease}
+.morenums summary::-webkit-details-marker{display:none}
+.morenums summary::after{content:'+';font-size:18px;line-height:1;font-weight:500}
+.morenums summary:hover{background:var(--navy);color:#fff}
+.morenums[open] summary::after{content:'\2212'}
+.morenums[open] summary{margin-bottom:6px}
+.cost-sub{margin-top:14px}
+
+@media(max-width:900px){
+  .hero2{grid-template-columns:1fr;gap:34px;min-height:0;padding-top:30px;padding-bottom:44px}
+  .hero2-art{margin-top:6px}
+}
+@media(max-width:760px){
+  .h1x{font-size:clamp(38px,11.2vw,52px)}
+  .ticks{gap:10px 18px}
+  .fd-form,.fd-out{padding:22px 20px 24px}
+  .phone{width:280px;height:572px;border-radius:44px}
+  .ph-screen{border-radius:35px}
+  .ph-body{top:108px}
+}
+@media(prefers-reduced-motion:reduce){.sc,.ap,.hire span,.done{transition:none !important}.chk circle,.chk path{animation:none !important;stroke-dashoffset:0}}
+
+
+/* ================= GSAP motion layer (2026-11-23) ================= */
+.h1x::after{transform:scaleX(var(--bar,1));transform-origin:left center}
+
+/* rolling digits in the finder */
+.fd-num{line-height:1.06}
+#fdOdo{display:inline-block;white-space:nowrap}
+.od{display:inline-block;width:.58em;height:1.06em;overflow:hidden;vertical-align:top;text-align:center}
+.od-col{display:flex;flex-direction:column;will-change:transform}
+.od-col span{display:block;height:1.06em;line-height:1.06}
+.od-s{display:inline-block;width:.22em;height:1.06em;line-height:1.06;vertical-align:top;text-align:center}
+
+/* ---------- How it works: steps on the left, phone that stays in view on the right ---------- */
+.how-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:clamp(32px,6vw,110px);align-items:start;margin-top:34px}
+.how-steps{--gap:clamp(36px,6vh,72px);position:relative}
+.how-step{position:relative;z-index:1}
+.how-step:not(:last-child){margin-bottom:var(--gap)}
+.how-step .step{position:relative;width:100%;background:#fff;border:1px solid var(--grey-mid);border-radius:18px;padding:26px 26px 28px;transition:opacity .45s ease,border-color .45s ease,box-shadow .45s ease}
+.how-step .step-n{width:40px;height:40px;font-size:16px}
+.how-step .step h3{font-size:19px;margin-top:16px}
+.how-step .step p{font-size:14px;line-height:1.65;margin-top:8px}
+.how-step .step small{display:block;font-size:12px;line-height:1.55;color:var(--muted2);margin-top:10px;padding-top:10px;border-top:1px solid var(--grey-mid)}
+/* line that joins one step number to the next, and fills with orange as you scroll */
+.how-link{position:absolute;left:45px;top:100%;height:var(--gap);width:2px;background:var(--grey-mid);border-radius:2px;overflow:hidden}
+.how-link i{position:absolute;inset:0;background:var(--orange);transform-origin:top center}
+.js-how .how-steps{padding-bottom:clamp(60px,10vh,110px)}
+.js-how .how-step:not(.on) .step{opacity:.42}
+.js-how .how-step.on .step,.js-how-auto .how-step.on .step{border-color:var(--orange);box-shadow:0 24px 46px -30px rgba(244,127,32,.6)}
+.how-stage{position:sticky;top:max(92px,calc(50vh - 340px));display:flex;flex-direction:column;align-items:center}
+@media(max-width:900px){
+  .how-grid{grid-template-columns:1fr;gap:26px}
+  .how-stage{position:relative;top:auto;order:-1}
+  .how-step:not(:last-child){margin-bottom:14px}
+  .how-link{display:none}
+}
+
+/* scenes inside the second phone */
+.hs{position:absolute;inset:0;padding:16px 16px 0;opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease;pointer-events:none}
+#phone2[data-h="a"] .hs-a,#phone2[data-h="b"] .hs-b,#phone2[data-h="c"] .hs-c{opacity:1;transform:none}
+#phone2[data-h="a"] .ph-dots i:nth-child(1),#phone2[data-h="b"] .ph-dots i:nth-child(-n+2),#phone2[data-h="c"] .ph-dots i{background:var(--orange)}
+#phone2 .ap{opacity:1;transform:none}
+#phone2 .done{opacity:1;transform:none;transition:none}
+.hire.on{background:var(--orange);border-color:var(--orange);color:#fff}
+.hire.on .h1{opacity:0;transform:translateY(-10px)}
+.hire.on .h2{opacity:1;transform:translateY(-50%)}
+#phone2.tap .f-btn{transform:scale(.95);box-shadow:0 0 0 7px rgba(244,127,32,.22)}
+.f-step b{display:inline-block}
+.f-btn{text-align:center}
+
+.ck-h{font-size:13px;font-weight:700;margin-bottom:12px}
+.ck{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--grey-mid);border-radius:14px;padding:12px;margin-bottom:10px}
+.ck-b{flex:none;width:28px;height:28px;border-radius:50%;border:2px solid var(--grey-mid);display:flex;align-items:center;justify-content:center;transition:background .35s ease,border-color .35s ease}
+.ck-b svg{width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:20;stroke-dashoffset:20;transition:stroke-dashoffset .4s .1s ease}
+.ck-b.ok{background:var(--orange);border-color:var(--orange)}
+.ck-b.ok svg{stroke-dashoffset:0}
+.ck-m{min-width:0}
+.ck-m b{display:block;font-size:12.5px;line-height:1.25}
+.ck-m small{display:block;font-size:10.5px;color:var(--muted);margin-top:2px}
+.ck-file{display:inline-flex;align-items:center;gap:7px;margin-top:8px;font-size:10.5px;font-weight:600;background:var(--grey);border-radius:7px;padding:5px 9px}
+.ck-file::before{content:'';width:9px;height:12px;border-radius:2px;background:var(--navy)}
+.ck-chips{display:flex;gap:6px;margin-top:8px}
+.ck-chips u{text-decoration:none;font-size:10px;font-weight:700;border:1.5px solid var(--navy);border-radius:999px;padding:4px 10px}
+.ck-ready{position:absolute;left:16px;right:16px;bottom:18px;background:#E4F5EC;color:#1B7A4B;border-radius:14px;padding:13px;text-align:center;font-size:12px;font-weight:700}
+.toast{position:absolute;left:16px;right:16px;bottom:18px;background:var(--navy);color:#fff;border-radius:14px;padding:13px 14px;font-size:11.5px;line-height:1.5;opacity:0}
+.toast b{display:block;color:var(--orange);font-size:12.5px;margin-bottom:2px}
 </style>
 <noscript><style>#preloader{display:none}.hero-anim{animation-play-state:running !important}.reveal{opacity:1;transform:none}.st-bar i{width:var(--w)}</style></noscript>
 </head>
+
 <body>
 <div id="preloader">
   <div class="spinner"></div>
@@ -415,48 +642,90 @@ body.loaded .hero-anim{animation-play-state:running}
       <img id="headerLogo" src="./assets/logo-troopers.png" alt="TROOPERS">
     </a>
     <nav id="siteNav">
-      <a href="#platform">Platform</a>
       <a href="#how">How it works</a>
-      <a href="#sheet">Roles</a>
-      <a href="#coverage">Where we work</a>
-      <a href="#results">Results</a>
+      <a href="#coverage">Part-timers near you</a>
       <a href="#cost">Costs</a>
       <a href="#faq">FAQ</a>
       <span id="navIndicator"></span>
     </nav>
     <div class="hdr-right">
-      <a href="https://troopersapp.com/employer-signup" target="_blank" rel="noopener" class="btn btn-orange hdr-cta">Create an account</a>
+      <a href="https://troopersapp.com/employer-signup" target="_blank" rel="noopener" class="btn btn-orange hdr-cta">Sign up free</a>
     </div>
   </div>
   <div id="progress"></div>
 </header>
 
 <section id="heroSection">
-  <div class="hero-media">
-    <img src="./assets/role-waiter.png" alt="F&amp;B crew carrying trays" class="hero-photo hero-anim" style="animation:heroPhotoIn 1.1s cubic-bezier(.16,.84,.44,1) both">
-  </div>
-  <div class="wrap hero-card-wrap">
-    <div class="hero-card">
-      <div>
-        <div class="eyebrow hero-anim" style="animation:heroUp .45s cubic-bezier(.16,.84,.44,1) both;animation-delay:.03s">F&amp;B Employers · Malaysia</div>
-        <h1 class="hero-h1">
-          <span class="hero-anim hl" style="animation:heroUp .45s cubic-bezier(.16,.84,.44,1) both;animation-delay:.09s">Short-staffed?</span>
-          <span class="hero-anim l3" style="animation:heroUp .45s cubic-bezier(.16,.84,.44,1) both;animation-delay:.2s">Post the shift yourself.</span>
-        </h1>
+  <div class="wrap hero2">
+    <div class="hero2-copy">
+      <div class="eyebrow hero-anim" style="animation:heroUp .45s cubic-bezier(.16,.84,.44,1) both;animation-delay:.03s">For F&amp;B owners in Malaysia</div>
+      <h1 class="h1x">
+        <span class="hero-anim" style="animation:heroUp .5s cubic-bezier(.16,.84,.44,1) both;animation-delay:.09s">Part-timers who</span>
+        <span class="hl hero-anim" style="animation:heroUp .5s cubic-bezier(.16,.84,.44,1) both;animation-delay:.2s">actually turn up.</span>
+      </h1>
+      <p class="hero-p hero-anim" style="animation:heroUp .45s cubic-bezier(.16,.84,.44,1) both;animation-delay:.32s">Post a shift and pick from ID-checked part-timers who have ratings from past shifts. We handle the contracts, pay slips and payments. Free to sign up.</p>
+      <div class="hero-btns hero-anim" style="animation:heroUp .45s cubic-bezier(.16,.84,.44,1) both;animation-delay:.4s">
+        <a href="https://troopersapp.com/employer-signup" target="_blank" rel="noopener" class="btn btn-orange">Post your first shift</a>
+        <a href="#how" class="btn btn-line">See how it works</a>
       </div>
-      <div>
-        <p class="hero-p hero-anim" style="animation:heroUp .45s cubic-bezier(.16,.84,.44,1) both;animation-delay:.32s">Need service crew, kitchen crew, baristas or banquet crew? Post the job and set your own rate. Checked, typhoid-ready part-timers apply to you directly, and you choose who works.</p>
-        <div class="hero-btns hero-anim" style="animation:heroUp .45s cubic-bezier(.16,.84,.44,1) both;animation-delay:.4s">
-          <a href="https://troopersapp.com/employer-signup" target="_blank" rel="noopener" class="btn btn-orange">Create an account</a>
-          <a href="#sheet" class="btn btn-line">See the roles</a>
+      <ul class="ticks hero-anim" style="animation:heroUp .45s cubic-bezier(.16,.84,.44,1) both;animation-delay:.48s">
+        <li>ID-checked part-timers</li>
+        <li>You pick who works</li>
+        <li>Pay after the shift</li>
+      </ul>
+    </div>
+
+    <div class="hero2-art hero-anim" style="animation:heroUp .6s cubic-bezier(.16,.84,.44,1) both;animation-delay:.25s">
+      <div class="arches"></div>
+      <p class="sr-only">Example of the TROOPERS app. You post a shift, our team checks it, part-timers apply, and you choose who to hire.</p>
+      <div class="phone" id="phone" data-s="4" aria-hidden="true">
+        <div class="ph-screen">
+          <div class="ph-notch"></div>
+          <div class="ph-top">
+            <div class="ph-brand"><img src="./assets/logo-troopers.png" alt=""><span>Employer</span></div>
+            <div class="ph-step" id="phStep">4 · You choose</div>
+            <div class="ph-dots"><i></i><i></i><i></i><i></i></div>
+          </div>
+          <div class="ph-body">
+
+            <div class="sc s1">
+              <div class="f-card"><label>Role</label><div class="f-val">Service Crew</div></div>
+              <div class="f-card"><label>When</label><div class="f-val">Saturday · 6:00pm to 11:00pm</div></div>
+              <div class="f-row">
+                <div class="f-card"><label>People</label><div class="f-step"><i>&minus;</i><b>3</b><i>+</i></div></div>
+                <div class="f-card"><label>Where</label><div class="f-val">Selangor</div></div>
+              </div>
+              <div class="f-btn">Post shift</div>
+              <p class="f-note">Choose the role, the day and how many people you need.</p>
+            </div>
+
+            <div class="sc s2">
+              <div class="chk">
+                <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="36"/><path d="M25 41l11 11 20-23"/></svg>
+                <b>Shift checked</b>
+                <p>Our team checks every shift first. This can take up to 3 working days.</p>
+              </div>
+            </div>
+
+            <div class="sc s3">
+              <div class="ap-h"><b>4 part-timers applied</b><small>Service Crew</small></div>
+              <div class="ap pick" style="--i:0"><span class="av"><img src="./assets/role-cafe.png" alt="" style="--x:58%;--y:18%;--z:2.6"></span><div class="ap-m"><b>Aisyah R.</b><small><em>&#9733; 4.9</em> · 38 shifts</small><div class="tags"><u>ID checked</u><u>Typhoid</u></div></div><div class="hire"><span class="h1">Hire</span><span class="h2">Hired</span></div></div>
+              <div class="ap pick" style="--i:1"><span class="av"><img src="./assets/case-qsr.png" alt="" style="--x:43%;--y:16%;--z:2.6"></span><div class="ap-m"><b>Daniel T.</b><small><em>&#9733; 4.8</em> · 24 shifts</small><div class="tags"><u>ID checked</u><u>Typhoid</u></div></div><div class="hire"><span class="h1">Hire</span><span class="h2">Hired</span></div></div>
+              <div class="ap pick" style="--i:2"><span class="av"><img src="./assets/case-lunch.png" alt="" style="--x:72%;--y:20%;--z:2.6"></span><div class="ap-m"><b>Mei Ling C.</b><small><em>&#9733; 5.0</em> · 51 shifts</small><div class="tags"><u>ID checked</u><u>Typhoid</u></div></div><div class="hire"><span class="h1">Hire</span><span class="h2">Hired</span></div></div>
+              <div class="ap" style="--i:3"><span class="av"><img src="./assets/role-barista.png" alt="" style="--x:39%;--y:16%;--z:2.6"></span><div class="ap-m"><b>Haziq A.</b><small><em>&#9733; 4.7</em> · 12 shifts</small><div class="tags"><u>ID checked</u></div></div><div class="hire"><span class="h1">Hire</span><span class="h2">Hired</span></div></div>
+              <div class="done"><span>Your crew for Saturday</span><b>3 of 3 hired</b></div>
+            </div>
+
+          </div>
         </div>
       </div>
+      <div class="ph-cap">Example screen. The names are made up.</div>
     </div>
   </div>
 </section>
 
 <section class="trust">
-  <div class="trust-kicker">Trusted by</div>
+  <div class="trust-kicker">Trusted by cafes, restaurants and hotels</div>
   <div class="marq">
     <div class="marq-track">
       <div class="marq-set">
@@ -465,19 +734,10 @@ body.loaded .hero-anim{animation-play-state:running}
         <div class="logo"><img class="boxed" src="./assets/logo-baskbear.jpg" alt="Bask Bear Coffee"></div>
         <div class="logo"><img src="./assets/logo-chatramue.png" alt="ChaTraMue"></div>
         <div class="logo"><img src="./assets/logo-llaollao.png" alt="llaollao"></div>
-        <div class="logo"><img src="./assets/logo-7eleven.png" alt="7-Eleven"></div>
         <div class="logo"><img src="./assets/logo-7cafe.png" alt="7 Cafe"></div>
-        <div class="logo"><img src="./assets/logo-mynews.png" alt="myNEWS"></div>
         <div class="logo"><img src="./assets/logo-traders.png" alt="Traders Hotels by Shangri-La"></div>
         <div class="logo"><img src="./assets/logo-parkroyal.png" alt="PARKROYAL Collection"></div>
-        <div class="logo"><img src="./assets/logo-cocacola.png" alt="Coca-Cola"></div>
-        <div class="logo"><img src="./assets/logo-watsons.png" alt="Watsons"></div>
-        <div class="logo"><img src="./assets/logo-guardian.png" alt="Guardian"></div>
-        <div class="logo"><img src="./assets/logo-shopeexpress.png" alt="Shopee Xpress"></div>
-        <div class="logo"><img src="./assets/logo-atome.png" alt="Atome"></div>
-        <div class="logo"><img src="./assets/logo-samsonite.png" alt="Samsonite"></div>
         <div class="logo"><img src="./assets/logo-montigo.png" alt="Montigo"></div>
-        <div class="logo"><img src="./assets/logo-habib.png" alt="Habib Jewels"></div>
       </div>
       <div class="marq-set">
         <div class="logo"><img src="./assets/logo-tealive.png" alt=""></div>
@@ -485,206 +745,150 @@ body.loaded .hero-anim{animation-play-state:running}
         <div class="logo"><img class="boxed" src="./assets/logo-baskbear.jpg" alt=""></div>
         <div class="logo"><img src="./assets/logo-chatramue.png" alt=""></div>
         <div class="logo"><img src="./assets/logo-llaollao.png" alt=""></div>
-        <div class="logo"><img src="./assets/logo-7eleven.png" alt=""></div>
         <div class="logo"><img src="./assets/logo-7cafe.png" alt=""></div>
-        <div class="logo"><img src="./assets/logo-mynews.png" alt=""></div>
         <div class="logo"><img src="./assets/logo-traders.png" alt=""></div>
         <div class="logo"><img src="./assets/logo-parkroyal.png" alt=""></div>
-        <div class="logo"><img src="./assets/logo-cocacola.png" alt=""></div>
-        <div class="logo"><img src="./assets/logo-watsons.png" alt=""></div>
-        <div class="logo"><img src="./assets/logo-guardian.png" alt=""></div>
-        <div class="logo"><img src="./assets/logo-shopeexpress.png" alt=""></div>
-        <div class="logo"><img src="./assets/logo-atome.png" alt=""></div>
-        <div class="logo"><img src="./assets/logo-samsonite.png" alt=""></div>
         <div class="logo"><img src="./assets/logo-montigo.png" alt=""></div>
-        <div class="logo"><img src="./assets/logo-habib.png" alt=""></div>
       </div>
     </div>
   </div>
 </section>
 
 <section id="why" class="wrap sec">
-  <div class="eyebrow">01 · The problem</div>
-  <h2 class="title">Workforce management is becoming <span class="hl">increasingly complex</span> for businesses today.</h2>
-  <p class="sub" style="margin-top:14px">With the Gig Workers Act 2025, staffing isn't just operational anymore. It's a compliance responsibility.</p>
-  <div class="pr-grid">
-    <div class="pr-wrap reveal"><div class="pr lift"><img src="./assets/problem-shortage.jpg" alt="Kitchen team reviewing a rota"><div class="pr-bd"><b>01 · Manpower Shortage</b><p>Frequent no-shows and inconsistent performance disrupt daily operations.</p></div></div></div>
-    <div class="pr-wrap reveal"><div class="pr lift"><img src="./assets/problem-workload.jpg" alt="Operations team reviewing outlet demand"><div class="pr-bd"><b>02 · Internal Team Workload</b><p>Fixed manpower structures make it harder to scale quickly around changing outlet demand.</p></div></div></div>
-    <div class="pr-wrap reveal"><div class="pr lift"><img src="./assets/problem-payroll.jpg" alt="Payroll paperwork and calculator"><div class="pr-bd"><b>03 · Payroll Complexity</b><p>Manual payroll, claims and attendance reconciliation add repetitive administrative work.</p></div></div></div>
-    <div class="pr-wrap reveal"><div class="pr lift"><img src="./assets/problem-compliance.jpg" alt="Manager reviewing licensing and compliance files"><div class="pr-bd"><b>04 · Compliance Challenges</b><p>Licensing, labour requirements and supporting records add complexity to workforce operations.</p></div></div></div>
+  <div class="eyebrow">Why TROOPERS</div>
+  <h2 class="title">Three staffing headaches, <span class="hl">handled.</span></h2>
+  <div class="why3">
+    <div class="why-wrap"><div class="why lift">
+      <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M16 11l2 2 4-4"/></svg></i>
+      <h3>A part-timer did not turn up?</h3>
+      <p>Every part-timer has a rating from their past shifts. You can see it before you pick, so you can choose people who show up.</p>
+    </div></div>
+    <div class="why-wrap"><div class="why lift">
+      <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></i>
+      <h3>Contracts, pay slips and payments?</h3>
+      <p>We handle them for you. You top up credits, and the cost is taken off after each shift is done.</p>
+    </div></div>
+    <div class="why-wrap"><div class="why lift">
+      <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></svg></i>
+      <h3>Food handler rules?</h3>
+      <p>Every part-timer is ID-checked. When you post a shift, you can ask for a Food Handler Certificate and a typhoid vaccination.</p>
+    </div></div>
   </div>
-  <div class="impact reveal"><b>Business impact</b><span>Customer experience</span><span>Sales &amp; outlet performance</span><span>Internal workload</span><span>Growth capacity</span></div>
-</section>
-
-<section id="act" class="wrap sec">
-  <div class="act-top">
-    <div>
-      <div class="eyebrow">02 · Gig Workers Act 2025</div>
-      <h2 class="title">Four obligations that are now <span class="hl">law.</span></h2>
-      <p class="sub" style="margin-top:14px">The Act formalises gig workers as a regulated workforce. These apply the moment you engage them, directly or through an agency.</p>
-    </div>
-    <div class="act-photo reveal"><img src="./assets/gig-act-ceremony.jpg" alt="TROOPERS representatives at the official Gig Workers Act appointment ceremony"><p>TROOPERS at the official Gig Workers Act appointment ceremony</p></div>
-  </div>
-  <div class="ob-grid">
-    <div class="ob-wrap reveal"><div class="ob lift"><div class="ob-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15 9h-4.5a1.5 1.5 0 0 0 0 3h3a1.5 1.5 0 0 1 0 3H9"/><line x1="12" y1="7" x2="12" y2="9"/><line x1="12" y1="15" x2="12" y2="17"/></svg><span>Payment terms</span></div><div class="ob-bd">Scope of work and pay clearly defined. Paid within <b>7 days</b> of job completion.</div></div></div>
-    <div class="ob-wrap reveal"><div class="ob lift"><div class="ob-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span>Documentation</span></div><div class="ob-bd">A detailed <b>earnings slip</b> for every shift: base, incentives, deductions.</div></div></div>
-    <div class="ob-wrap reveal"><div class="ob lift"><div class="ob-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg><span>Deduction caps</span></div><div class="ob-bd">Only approved deductions, capped at <b>50%</b> of earnings.</div></div></div>
-    <div class="ob-wrap reveal"><div class="ob lift"><div class="ob-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/></svg><span>Termination</span></div><div class="ob-bd">No deactivation without valid reason, investigation and right to respond.</div></div></div>
-  </div>
-  <div class="act-cmp">
-    <div class="cmp-card own reveal"><div class="cmp-k">On your own</div><div class="cmp-v">RM 50,000</div><p>Max fine + backpay, plus months of tribunal prep and HR time.</p></div>
-    <div class="cmp-card with reveal"><div class="cmp-k">With TROOPERS</div><div class="cmp-v">Covered</div><p>We're the engaging party. Contracts, records and earnings slips are generated as evidence, compliant by default.</p></div>
-  </div>
-</section>
-
-<section id="models" class="wrap sec">
-  <div class="eyebrow">03 · Workforce comparison</div>
-  <h2 class="title">Three workforce models, <span class="hl">very different trade-offs.</span></h2>
-  <div class="models">
-    <div class="model-wrap reveal"><div class="model lift"><h3>Local Full-Time Hiring</h3><small>Employment Act 1955</small><ul><li>Fixed hours, 1–3 month notice to terminate</li><li>EPF, SOCSO, annual leave: fixed monthly cost</li><li>Best for core, permanent operations</li></ul></div></div>
-    <div class="model-wrap reveal"><div class="model lift"><h3>Foreign Workers</h3><small>Levy, permit &amp; FWCS</small><ul><li>4–6 week lead time for permit approval</li><li>Highest total cost of the three models</li><li>Best for stable, long-duration tasks</li></ul></div></div>
-    <div class="model-wrap reveal"><div class="model us lift"><h3>&#10022; TROOPERS: Malaysian Gig</h3><small>Gig Workers Act 2025</small><ul><li>Deploy any volume, scale by shift</li><li>One transparent all-in rate, zero hidden costs</li><li>Attendance · Payroll · Compliance · Quality, all handled</li></ul></div></div>
-  </div>
-</section>
-
-<section id="platform" class="wrap sec">
-  <div class="eyebrow">04 · Product features</div>
-  <h2 class="title">A complete <span class="hl">digital solution</span> for manpower management.</h2>
-  <p class="sub" style="margin-top:14px">Click a feature to see the real product screen and what it does.</p>
-  <div class="plat">
-    <div class="plat-screen reveal"><div class="shot"><img id="featImg" src="./assets/screen-ai-matcher.webp" alt="AI Job Matcher product screen"></div><div class="plat-cap" id="featCap">Product screen · AI Job Matcher</div></div>
-    <div class="reveal">
-      <div class="feat-k">Product feature</div>
-      <div class="feat-t" id="featT">AI Job Matcher</div>
-      <p class="feat-d" id="featD">Ranks talents using qualification, performance and talent rating signals.</p>
-      <div class="feats"><button type="button" class="feat on" data-img="./assets/screen-ai-matcher.webp" data-t="AI Job Matcher" data-d="Ranks talents using qualification, performance and talent rating signals." aria-pressed="true"><b>AI Job Matcher</b></button><button type="button" class="feat" data-img="./assets/screen-smart-rostering.webp" data-t="Smart Rostering" data-d="Plan confirmed talents and shift schedules clearly by location and date." aria-pressed="false"><b>Smart Rostering</b></button><button type="button" class="feat" data-img="./assets/screen-supporting-documents.webp" data-t="Supporting Documents" data-d="View supporting documents such as Food Handling and Typhoid certificates." aria-pressed="false"><b>Supporting Documents</b></button><button type="button" class="feat" data-img="./assets/screen-talent-rating.webp" data-t="Talent Rating" data-d="Capture client feedback and talent ratings after each job." aria-pressed="false"><b>Talent Rating</b></button><button type="button" class="feat" data-img="./assets/screen-predictive-no-show.webp" data-t="Predictive No-Show" data-d="Identify possible no-show and cancellation risks before the shift." aria-pressed="false"><b>Predictive No-Show</b></button><button type="button" class="feat" data-img="./assets/screen-backup-talent.webp" data-t="Backup Talent" data-d="Maintain confirmed backup talent applications for replacement support." aria-pressed="false"><b>Backup Talent</b></button><button type="button" class="feat" data-img="./assets/screen-fulfilment-report.webp" data-t="Fulfilment Report" data-d="Receive a clear hiring fulfilment report by job, location and talent." aria-pressed="false"><b>Fulfilment Report</b></button><button type="button" class="feat" data-img="./assets/screen-hiring-report.webp" data-t="Hiring Report" data-d="Receive check-in and attendance reporting for active talents." aria-pressed="false"><b>Hiring Report</b></button><button type="button" class="feat" data-img="./assets/screen-payroll.webp" data-t="Payroll, OT &amp; Claims" data-d="Track approved OT, claims, reimbursements and payment status." aria-pressed="false"><b>Payroll, OT &amp; Claims</b></button><button type="button" class="feat" data-img="./assets/screen-earnings.webp" data-t="Earnings &amp; Payment" data-d="Review check-in/out details, earnings adjustments and final payment information." aria-pressed="false"><b>Earnings &amp; Payment</b></button></div>
-    </div>
-  </div>
+  <div class="impact reveal"><b>Good for</b><span>Cover for someone away</span><span>Busy festive season</span><span>New outlet opening</span><span>One-night banquet</span></div>
 </section>
 
 <section id="how" class="wrap sec">
   <div class="sec-head">
     <div>
-      <div class="eyebrow">05 · How it works</div>
-      <h2 class="title">Six steps from sign-up to hired.</h2>
+      <div class="eyebrow">How it works</div>
+      <h2 class="title">Three simple steps to <span class="hl">your crew.</span></h2>
     </div>
-    <p class="sub">Sign up once, then post a job whenever you need crew.</p>
+    <p class="sub">Sign up once, then post a shift whenever you need people.</p>
   </div>
-  <div class="steps">
-    <div class="step-wrap reveal"><div class="step lift">
-      <span class="step-n">1</span>
-      <h3>Create a free account</h3>
-      <p>Sign up as an employer in the TROOPERS app. It is free.</p>
-    </div></div>
-    <div class="step-wrap reveal"><div class="step lift">
-      <span class="step-n">2</span>
-      <h3>Upload your SSM documents</h3>
-      <p>Add your company registration papers (SSM) to your account.</p>
-    </div></div>
-    <div class="step-wrap reveal"><div class="step lift">
-      <span class="step-n">3</span>
-      <h3>Top up your credits</h3>
-      <p>Add credits by card or business online banking before you post a job.</p>
-    </div></div>
-    <div class="step-wrap reveal"><div class="step lift">
-      <span class="step-n">4</span>
-      <h3>Post your job</h3>
-      <p>Choose the role, how many people you need and your pay rate. Our team checks the job within 3 working days.</p>
-    </div></div>
-    <div class="step-wrap reveal"><div class="step lift">
-      <span class="step-n">5</span>
-      <h3>Chat and hire</h3>
-      <p>When the job is approved, chat with the part-timers who apply and hire them whenever you like.</p>
-    </div></div>
-    <div class="step-wrap reveal"><div class="step lift">
-      <span class="step-n">6</span>
-      <h3>Pay after each shift</h3>
-      <p>Credits are taken off automatically after the shift ends. You only pay for shifts that are completed.</p>
-    </div></div>
+  <div class="how-grid">
+    <div class="how-steps">
+      <div class="how-step" data-i="0"><div class="step">
+        <span class="step-n">1</span>
+        <h3>Sign up and get ready</h3>
+        <p>Create a free account in the TROOPERS app. Add your SSM papers (your company registration) and top up credits by card or online banking.</p>
+        <small>Signing up is free.</small>
+      </div><div class="how-link" aria-hidden="true"><i></i></div></div>
+      <div class="how-step" data-i="1"><div class="step">
+        <span class="step-n">2</span>
+        <h3>Post your shift</h3>
+        <p>Pick the role, how many people you need and your pay rate.</p>
+        <small>Our team checks every shift first. This can take up to 3 working days.</small>
+      </div><div class="how-link" aria-hidden="true"><i></i></div></div>
+      <div class="how-step" data-i="2"><div class="step">
+        <span class="step-n">3</span>
+        <h3>Pick your crew</h3>
+        <p>Part-timers apply. Chat with them and hire the ones you like.</p>
+        <small>Credits are taken off after the shift ends. You only pay for shifts that are done.</small>
+      </div></div>
+    </div>
+
+    <div class="how-stage">
+      <p class="sr-only">Example of the TROOPERS app. You sign up and add your papers and credits, then post a shift, then choose who to hire.</p>
+      <div class="phone" id="phone2" data-h="c" aria-hidden="true">
+        <div class="ph-screen">
+          <div class="ph-notch"></div>
+          <div class="ph-top">
+            <div class="ph-brand"><img src="./assets/logo-troopers.png" alt=""><span>Employer</span></div>
+            <div class="ph-step" id="ph2Step">3 &middot; Pick your crew</div>
+            <div class="ph-dots"><i></i><i></i><i></i></div>
+          </div>
+          <div class="ph-body">
+
+            <div class="hs hs-a">
+              <div class="ck-h">Set up your account</div>
+              <div class="ck"><span class="ck-b ok"><svg viewBox="0 0 20 20"><path d="M5.5 10.5l3 3 6-6.5"/></svg></span><div class="ck-m"><b>Create a free account</b><small>Sign up as an employer</small></div></div>
+              <div class="ck"><span class="ck-b ok"><svg viewBox="0 0 20 20"><path d="M5.5 10.5l3 3 6-6.5"/></svg></span><div class="ck-m"><b>Add your SSM papers</b><small>Your company registration</small><div class="ck-file">SSM documents.pdf</div></div></div>
+              <div class="ck"><span class="ck-b ok"><svg viewBox="0 0 20 20"><path d="M5.5 10.5l3 3 6-6.5"/></svg></span><div class="ck-m"><b>Top up your credits</b><small>By card or online banking</small><div class="ck-chips"><u>Card</u><u>Online banking</u></div></div></div>
+              <div class="ck-ready">You are ready to post a shift</div>
+            </div>
+
+            <div class="hs hs-b">
+              <div class="f-card"><label>Role</label><div class="f-val">Service Crew</div></div>
+              <div class="f-card"><label>When</label><div class="f-val">Saturday &middot; 6:00pm to 11:00pm</div></div>
+              <div class="f-row">
+                <div class="f-card"><label>People</label><div class="f-step"><i>&minus;</i><b id="ph2n">3</b><i>+</i></div></div>
+                <div class="f-card"><label>Where</label><div class="f-val">Selangor</div></div>
+              </div>
+              <div class="f-btn">Post shift</div>
+              <div class="toast"><b>Shift posted</b>Our team checks it first. This can take up to 3 working days.</div>
+            </div>
+
+            <div class="hs hs-c">
+              <div class="ap-h"><b>4 part-timers applied</b><small>Service Crew</small></div>
+              <div class="ap pick" style="--i:0"><span class="av"><img src="./assets/role-cafe.png" alt="" style="--x:58%;--y:18%;--z:2.6"></span><div class="ap-m"><b>Aisyah R.</b><small><em>&#9733; 4.9</em> · 38 shifts</small><div class="tags"><u>ID checked</u><u>Typhoid</u></div></div><div class="hire on"><span class="h1">Hire</span><span class="h2">Hired</span></div></div>
+              <div class="ap pick" style="--i:1"><span class="av"><img src="./assets/case-qsr.png" alt="" style="--x:43%;--y:16%;--z:2.6"></span><div class="ap-m"><b>Daniel T.</b><small><em>&#9733; 4.8</em> · 24 shifts</small><div class="tags"><u>ID checked</u><u>Typhoid</u></div></div><div class="hire on"><span class="h1">Hire</span><span class="h2">Hired</span></div></div>
+              <div class="ap pick" style="--i:2"><span class="av"><img src="./assets/case-lunch.png" alt="" style="--x:72%;--y:20%;--z:2.6"></span><div class="ap-m"><b>Mei Ling C.</b><small><em>&#9733; 5.0</em> · 51 shifts</small><div class="tags"><u>ID checked</u><u>Typhoid</u></div></div><div class="hire on"><span class="h1">Hire</span><span class="h2">Hired</span></div></div>
+              <div class="ap" style="--i:3"><span class="av"><img src="./assets/role-barista.png" alt="" style="--x:39%;--y:16%;--z:2.6"></span><div class="ap-m"><b>Haziq A.</b><small><em>&#9733; 4.7</em> · 12 shifts</small><div class="tags"><u>ID checked</u></div></div><div class="hire"><span class="h1">Hire</span><span class="h2">Hired</span></div></div>
+              <div class="done"><span>Your crew for Saturday</span><b>3 of 3 hired</b></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="ph-cap">Example screen. The names are made up.</div>
+    </div>
   </div>
   <div class="btn-row reveal">
-    <a href="https://troopersapp.com/employer-signup" target="_blank" rel="noopener" class="btn btn-orange">Create an account</a>
+    <a href="https://troopersapp.com/employer-signup" target="_blank" rel="noopener" class="btn btn-orange">Post your first shift</a>
     <a href="#faq" class="btn btn-line">Read the questions</a>
-  </div>
-</section>
-
-<section id="sheet" class="wrap sec">
-  <div class="sec-head">
-    <div>
-      <div class="eyebrow">06 · Roles</div>
-      <h2 class="title">Roles you can hire</h2>
-    </div>
-    <p class="sub">Pick the kind of crew you need. You set the pay rate and how many people. Part-timers apply, and you choose who works.</p>
-  </div>
-
-  <div class="roles">
-    <div class="role-wrap reveal"><div class="role"><span class="role-n">01</span><img class="role-img" src="./assets/case-fine-dining.png" alt="Service crew member greeting a guest" style="object-position:45% 16%"><div class="role-name">Service Crew</div><div class="role-desc">Serving guests on the floor: taking orders, clearing and resetting tables, general help</div></div></div>
-    <div class="role-wrap reveal"><div class="role"><span class="role-n">02</span><img class="role-img" src="./assets/role-kitchen.png" alt="Kitchen crew plating a dish" style="object-position:45% 15%"><div class="role-name">Kitchen Crew</div><div class="role-desc">Working in the kitchen: preparing food, helping plate dishes, closing up</div></div></div>
-    <div class="role-wrap reveal"><div class="role"><span class="role-n">03</span><img class="role-img" src="./assets/role-stewarding.png" alt="Stewarding crew washing dishes" style="object-position:55% 15%"><div class="role-name">Stewarding Crew</div><div class="role-desc">Washing dishes and glasses, keeping the kitchen clean</div></div></div>
-    <div class="role-wrap reveal"><div class="role"><span class="role-n">04</span><img class="role-img" src="./assets/role-barista.png" alt="Barista at the espresso machine" style="object-position:48% 22%"><div class="role-name">Barista</div><div class="role-desc">Making coffee and drinks, taking payments at the till</div></div></div>
-    <div class="role-wrap reveal"><div class="role"><span class="role-n">05</span><img class="role-img" src="./assets/role-banquet.png" alt="Host in a hotel ballroom" style="object-position:40% 24%"><div class="role-name">Banquet Crew</div><div class="role-desc">Setting up the room, serving each course, clearing up afterwards</div></div></div>
-    <div class="role-wrap reveal"><div class="role"><span class="role-n">06</span><img class="role-img" src="./assets/role-usher.png" alt="Hostess greeting a guest" style="object-position:64% 20%"><div class="role-name">Hostess</div><div class="role-desc">Welcoming guests, showing them to their seats, pointing the way</div></div></div>
-    <div class="role-wrap reveal"><div class="role"><span class="role-n">07</span><img class="role-img" src="./assets/role-concierge.png" alt="Concierge greeting a guest at the front desk" style="object-position:20% 15%"><div class="role-name">Concierge</div><div class="role-desc">Helping guests with requests, giving tips, carrying luggage</div></div></div>
-    <div class="role-wrap reveal"><div class="role"><span class="role-n">08</span><img class="role-img" src="./assets/role-frontdesk.png" alt="Receptionist checking in a guest" style="object-position:30% 15%"><div class="role-name">Front Desk / Receptionist</div><div class="role-desc">Checking guests in and out, taking payments, giving out rooms</div></div></div>
-    <div class="role-wrap reveal"><div class="role"><span class="role-n">09</span><img class="role-img" src="./assets/role-housekeeping.png" alt="Housekeeping crew making a bed" style="object-position:40% 15%"><div class="role-name">Housekeeping</div><div class="role-desc">Cleaning rooms, making beds, restocking guest items</div></div></div>
-    <div class="role-wrap reveal"><div class="role"><span class="role-n">10</span><img class="role-img" src="./assets/role-centralkitchen.png" alt="Central Kitchen crew packing meal trays" style="object-position:35% 15%"><div class="role-name">Central Kitchen</div><div class="role-desc">Packing food, keeping track of stock, sending out orders</div></div></div>
-  </div>
-  <p class="note">When you post a job, you can ask for a Food Handler Certificate and a typhoid vaccination. Every part-timer has their ID checked and completes our onboarding before they can apply.</p>
-</section>
-
-<section class="band-wrap">
-  <div class="band-track">
-    <div class="band-set">
-      <img src="./assets/case-lunch.png" alt="Busy lunch service" class="band-photo" style="object-position:70% 32%">
-      <img src="./assets/role-cafe.png" alt="Cafe crew serving" class="band-photo" style="object-position:52% 28%">
-      <img src="./assets/role-usher.png" alt="Hostess" class="band-photo" style="object-position:64% 20%">
-      <img src="./assets/role-barista.png" alt="Barista" class="band-photo" style="object-position:48% 22%">
-      <img src="./assets/role-banquet.png" alt="Hotel host" class="band-photo" style="object-position:40% 24%">
-      <img src="./assets/case-qsr.png" alt="Crew with a drinks tray" class="band-photo" style="object-position:40% 28%">
-    </div>
-    <div class="band-set">
-      <img src="./assets/case-lunch.png" alt="" class="band-photo" style="object-position:70% 32%">
-      <img src="./assets/role-cafe.png" alt="" class="band-photo" style="object-position:52% 28%">
-      <img src="./assets/role-usher.png" alt="" class="band-photo" style="object-position:64% 20%">
-      <img src="./assets/role-barista.png" alt="" class="band-photo" style="object-position:48% 22%">
-      <img src="./assets/role-banquet.png" alt="" class="band-photo" style="object-position:40% 24%">
-      <img src="./assets/case-qsr.png" alt="" class="band-photo" style="object-position:40% 28%">
-    </div>
-  </div>
-</section>
-
-<section id="welfare" class="wrap sec">
-  <div class="two-eq">
-    <div class="reveal">
-      <div class="eyebrow">07 · Talent welfare</div>
-      <h2 class="title">Talents who <span class="hl">stay</span> know your floor.</h2>
-      <p class="sub" style="margin-top:14px">Trained, protected and supported from onboarding to every shift after. That's what a fulfilment rate is made of.</p>
-      <div class="kpis"><div class="kpi dark"><b>10×</b><span>Higher hiring success after certification</span></div><div class="kpi"><b>90%+</b><span>Fulfilment reliability</span></div></div>
-    </div>
-    <div>
-      <div class="perks-t reveal">Trooperks: our benefits layer</div>
-      <div class="perks"><div class="perk reveal"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg></i><b>Troopers Academy</b><p>Role-specific training before every deployment</p></div><div class="perk reveal"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15 9h-4.5a1.5 1.5 0 0 0 0 3h3a1.5 1.5 0 0 1 0 3H9"/><line x1="12" y1="7" x2="12" y2="9"/><line x1="12" y1="15" x2="12" y2="17"/></svg></i><b>Early Wage Access</b><p>Instant post-shift payouts, no waiting for payday</p></div><div class="perk reveal"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/></svg></i><b>Accident &amp; Disablement</b><p>Up to RM7,500 cover</p></div><div class="perk reveal"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="3" y1="10" x2="21" y2="10"/></svg></i><b>Income Replacement</b><p>Up to RM50/day when unable to work</p></div><div class="perk reveal"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg></i><b>Device Protection</b><p>Up to RM400 accidental damage cover</p></div><div class="perk reveal"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 8v8M8 12h8"/></svg></i><b>E-Doctor</b><p>On-demand healthcare consultations</p></div></div>
-    </div>
-  </div>
-</section>
-
-<section id="dash" class="wrap sec">
-  <div class="two-eq">
-    <div class="reveal">
-      <div class="eyebrow">08 · Dashboard</div>
-      <h2 class="title">Full visibility over your workforce, <span class="hl">in real time.</span></h2>
-      <p class="sub" style="margin-top:14px">A centralised reporting dashboard: attendance, performance and revenue, all in one place, accessible anytime.</p>
-      <ul class="dash-list"><li>Real-time attendance and shift tracking across all outlets</li><li>Workforce performance analytics</li><li>Client-level reporting access anytime, anywhere</li></ul>
-    </div>
-    <div class="reveal"><img class="dash-img" src="./assets/screen-dashboard.webp" alt="TROOPERS dashboard: upcoming shifts, attendance overview, OT record, payment overview and hiring fulfilment"></div>
   </div>
 </section>
 
 <section id="coverage" class="wrap sec">
   <div class="cov-head">
-    <div class="eyebrow reveal">09 · Talent pool</div>
-    <h2 class="title reveal">Strong &amp; ready talent pool in Malaysia.</h2>
-    <p class="sub reveal">A deep, location-ready talent pool across different states, so deployments stay fast and reliable even when the labour market is tight. Each glowing dot is a state, or Singapore, where part-timers have signed up with us.</p>
+    <div class="eyebrow reveal">Part-timers near you</div>
+    <h2 class="title reveal">How many part-timers are <span class="hl">near your outlet?</span></h2>
+    <p class="sub reveal">Pick the crew you need and where you are. We will show you how many approved part-timers are there.</p>
+  </div>
+
+  <div class="finder reveal">
+    <div class="fd-form">
+      <div class="fd-q">1. What crew do you need?</div>
+      <div class="fd-chips" id="fdRoles" role="group" aria-label="Crew you need"></div>
+      <div class="fd-row">
+        <div>
+          <div class="fd-q">2. How many people?</div>
+          <div class="fd-step"><button type="button" id="fdMinus" aria-label="Fewer people">&minus;</button><b id="fdCount" aria-live="polite">3</b><button type="button" id="fdPlus" aria-label="More people">+</button></div>
+        </div>
+        <div>
+          <div class="fd-q"><label for="fdWhere">3. Where is your outlet?</label></div>
+          <select id="fdWhere" class="fd-sel"></select>
+        </div>
+      </div>
+    </div>
+    <div class="fd-out">
+      <div class="fd-k">Approved part-timers in</div>
+      <div class="fd-where" id="fdWhereName">Selangor</div>
+      <div class="fd-num" id="fdNum" aria-live="polite"><span class="sr-only" id="fdNumTxt">39,842</span><span id="fdOdo" aria-hidden="true">39,842</span></div>
+      <p class="fd-p" id="fdLine"></p>
+      <a href="https://troopersapp.com/employer-signup" target="_blank" rel="noopener" class="btn btn-orange">Post this shift</a>
+      <p class="fd-fine">Our team checks every shift first. This can take up to 3 working days. Numbers are as of 23 Oct 2026.</p>
+    </div>
   </div>
 
   <div class="globe-panel reveal">
@@ -698,23 +902,20 @@ body.loaded .hero-anim{animation-play-state:running}
     </div>
   </div>
 
-  <div class="cov-cards">
+  <details class="morenums reveal">
+    <summary>See the numbers for every state</summary>
+    <div class="cov-cards">
     <div class="reveal"><div id="myCard" class="cov-card"></div></div>
     <div class="reveal"><div id="sgCard" class="cov-card"></div></div>
   </div>
-  <p class="note reveal">These are part-timers who have signed up and been approved on TROOPERS, as of 23 Oct 2026. Each state or area counts part-timers who said they are happy to work there. One person can pick more than one place, so the places add up to more than the total. Federal Territories means Kuala Lumpur, Putrajaya and Labuan together. Singapore area outlines: URA Master Plan 2014, via data.gov.sg (Singapore Open Data Licence).</p>
-</section>
-
-<section id="results" class="wrap sec">
-  <div class="eyebrow">10 · Case studies</div>
-  <h2 class="title">Proven results across <span class="hl">F&amp;B &amp; Hospitality.</span></h2>
-  <div class="cases"><div class="case-wrap reveal"><div class="case lift"><div class="case-tag">F&amp;B · Nationwide Beverage Client</div><h3>Centralised a large in-house part-time workforce across nationwide outlets.</h3><p>Onboarded existing talents, built a dedicated F&amp;B pool, enabled flexible replacements and managed payroll, attendance, scheduling and coordination end-to-end.</p><div class="case-stats"><div><b>1,700+</b><span>Talents onboarded</span></div><div><b>1,000+</b><span>Outlets supported</span></div><div><b>+36%</b><span>Fulfilment growth</span></div></div></div></div><div class="case-wrap reveal"><div class="case lift"><div class="case-tag">F&amp;B · Multi-Outlet Operations</div><h3>Built a trained, reliable pool to reduce staffing gaps and reactive scheduling.</h3><p>Predictive rostering, no-show risk management, talent ratings, online courses and a dedicated F&amp;B talent pool.</p><div class="case-stats"><div><b>Zero</b><span>Staffing gap</span></div><div><b>100%</b><span>Smart scheduling</span></div><div><b>100%</b><span>Verified quality talent</span></div></div></div></div><div class="case-wrap reveal"><div class="case lift"><div class="case-tag">Hospitality · Hotel Payroll</div><h3>Replaced manual post-shift cash payments with centralised digital payroll.</h3><p>Digital payment processing, centralised talent management, clear payroll records and transparent reporting.</p><div class="case-stats"><div><b>1</b><span>Centralised system</span></div><div><b>24 hrs</b><span>Payment processing</span></div><div><b>0%</b><span>Payment dispute</span></div></div></div></div><div class="case-wrap reveal"><div class="case lift"><div class="case-tag">Hospitality · Hotel Operations</div><h3>Rapidly fulfilled daily hotel manpower with certified, job-ready talents.</h3><p>Qualified deployment within hours, predictive rostering, Typhoid-certified talent pool and service-standard training.</p><div class="case-stats"><div><b>180+</b><span>Unique talents</span></div><div><b>99.7%</b><span>Fulfilment rate</span></div><div><b>2 hrs</b><span>Replacement fulfilled</span></div></div></div></div></div>
+    <p class="note">These are part-timers who have signed up and been approved on TROOPERS, as of 23 Oct 2026. Each state or area counts part-timers who said they are happy to work there. One person can pick more than one place, so the places add up to more than the total. Federal Territories means Kuala Lumpur, Putrajaya and Labuan together. Singapore area outlines: URA Master Plan 2014, via data.gov.sg (Singapore Open Data Licence).</p>
+  </details>
 </section>
 
 <section id="cost" class="wrap sec">
-  <div class="eyebrow">11 · Transparent pricing</div>
-  <h2 class="title">Clear rates. <span class="hl">See exactly what makes up your cost.</span></h2>
-  <p class="sub" style="margin-top:14px">Add extras only when they apply. Each extra can be changed, and it is included in the final total.</p>
+  <div class="eyebrow">Costs</div>
+  <h2 class="title">Know your cost <span class="hl">before you post.</span></h2>
+  <p class="sub" style="margin-top:14px">Signing up is free, and you only pay for shifts that are done.</p>
   <details class="rates reveal">
     <summary><span class="calc-t"><b>See our rates and estimate your total cost</b><small>Rates can change, so open this to see the current ones.</small></span><span class="calc-btn"><span class="lbl-open">Show rates</span><span class="lbl-close">Hide rates</span></span></summary>
     <div class="rate-grid">
@@ -746,33 +947,10 @@ body.loaded .hero-anim{animation-play-state:running}
   </details>
 </section>
 
-<section id="calls" class="wrap sec">
-  <div class="eyebrow">12 · When you need us</div>
-  <h2 class="title">Four times you'll need extra hands</h2>
-  <div class="ob-grid">
-    <div class="ob-wrap reveal"><div class="ob lift">
-      <div class="ob-hd"><span class="ob-n">01</span><span>Someone is away or has left</span></div>
-      <div class="ob-bd">Cover the gap with part-timers while you find a permanent hire.</div>
-    </div></div>
-    <div class="ob-wrap reveal"><div class="ob lift">
-      <div class="ob-hd"><span class="ob-n">02</span><span>Busy festive season</span></div>
-      <div class="ob-bd">Ramadan, Chinese New Year, year-end. Get trained crew for a few weeks without hiring permanent staff.</div>
-    </div></div>
-    <div class="ob-wrap reveal"><div class="ob lift">
-      <div class="ob-hd"><span class="ob-n">03</span><span>New outlet opening</span></div>
-      <div class="ob-bd">Get floor and kitchen crew from the first day, while you hire your permanent team.</div>
-    </div></div>
-    <div class="ob-wrap reveal"><div class="ob lift">
-      <div class="ob-hd"><span class="ob-n">04</span><span>Banquet night</span></div>
-      <div class="ob-bd">Crew for just one evening, as many as the event needs. They are briefed and in uniform.</div>
-    </div></div>
-  </div>
-</section>
-
 <section id="faq" class="wrap sec">
   <div class="two-col">
     <div class="reveal">
-      <div class="eyebrow">13 · Questions</div>
+      <div class="eyebrow">Questions</div>
       <h2 class="title">Questions you might have.</h2>
       <p class="sub" style="margin-top:14px">Something else? Email our client support team.</p>
       <a href="mailto:clientsupport@troopers.com.my" class="mail">clientsupport@troopers.com.my</a>
@@ -781,11 +959,11 @@ body.loaded .hero-anim{animation-play-state:running}
       <details><summary>Do I pay to sign up?</summary><div class="faq-a">No. Creating an account is free.</div></details>
       <details><summary>What do I need to get started?</summary><div class="faq-a">Your SSM documents (your company registration) and some credits in your account. You can top up by card or business online banking. Then you can post your first job.</div></details>
       <details><summary>How long until my job goes up?</summary><div class="faq-a">Our team checks every job within 3 working days. Once it is approved, you can chat with part-timers and hire them whenever you like.</div></details>
-      <details><summary>How much does it cost?</summary><div class="faq-a">You set the pay rate for each job. A service fee and SST are added on top. Late-night, public holiday and last-minute shifts cost extra. Open the rates in the Transparent pricing section above to see everything and work out your total.</div></details>
-      <details><summary>What if I cancel a shift?</summary><div class="faq-a">Cancelling close to the shift date has a charge. Open the rates in the Transparent pricing section above to see the details.</div></details>
+      <details><summary>How much does it cost?</summary><div class="faq-a">You set the pay rate for each job. A service fee and SST are added on top. Late-night, public holiday and last-minute shifts cost extra. Open the rates in the Costs section above to see everything and work out your total.</div></details>
+      <details><summary>What if I cancel a shift?</summary><div class="faq-a">Cancelling close to the shift date has a charge. Open the rates in the Costs section above to see the details.</div></details>
       <details><summary>Can I ask for certificates?</summary><div class="faq-a">Yes. When you post a job, you can ask for a Food Handler Certificate and a typhoid vaccination.</div></details>
-      <details><summary>Which roles can I hire?</summary><div class="faq-a">Service crew, kitchen crew, stewarding crew, baristas, banquet crew, hostesses, concierge, front desk, housekeeping and central kitchen crew. The full list is in the Roles section above.</div></details>
-      <details><summary>Where are the part-timers?</summary><div class="faq-a">Part-timers have signed up in every Malaysian state, and in Singapore. The map above shows the numbers.</div></details>
+      <details><summary>Which roles can I hire?</summary><div class="faq-a">Service crew, kitchen crew, stewarding crew, baristas, banquet crew, hostesses, concierge, front desk, housekeeping and central kitchen crew. You can try them all in the "Part-timers near you" box above.</div></details>
+      <details><summary>Where are the part-timers?</summary><div class="faq-a">Part-timers have signed up in every Malaysian state, and in Singapore. The "Part-timers near you" section above shows the numbers.</div></details>
     </div>
   </div>
 </section>
@@ -796,8 +974,8 @@ body.loaded .hero-anim{animation-play-state:running}
   <div class="wrap band-in">
     <div class="band-copy reveal">
       <h2>Ready to<br><span style="color:#F47F20">post a shift?</span></h2>
-      <p>Post the job at your own rate. Checked, typhoid-ready part-timers apply, and you choose who works.</p>
-      <a href="https://troopersapp.com/employer-signup" target="_blank" rel="noopener" class="btn btn-orange">Create an account</a>
+      <p>Sign up for free, post your shift and pick your part-timers. We handle the paperwork.</p>
+      <a href="https://troopersapp.com/employer-signup" target="_blank" rel="noopener" class="btn btn-orange">Post your first shift</a>
     </div>
     <div class="talk reveal">
       <div class="talk-t">Questions first?</div>
@@ -851,7 +1029,7 @@ body.loaded .hero-anim{animation-play-state:running}
     </div>
     <div class="reveal" style="flex:1;min-width:150px">
       <div class="ft-h">Company</div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;font-size:13.5px;color:var(--ink)"><a href="https://troopers.com.my/" target="_blank" rel="noopener" class="footer-link">About us</a><span>Other industries</span><a href="https://troopers.com.my/#welfare" target="_blank" rel="noopener" class="footer-link">Compliance</a><a href="mailto:clientsupport@troopers.com.my" class="footer-link">Contact</a><a href="https://troopersapp.com/employer-signup" target="_blank" rel="noopener" class="footer-link">Sign up</a><a href="https://troopers.com.my/part-time-jobs-malaysia" target="_blank" rel="noopener" class="footer-link">Looking for work?</a></div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;font-size:13.5px;color:var(--ink)"><a href="https://troopers.com.my/" target="_blank" rel="noopener" class="footer-link">About us</a><a href="./for-chains.html" class="footer-link">For chains and bigger teams</a><a href="https://troopers.com.my/#welfare" target="_blank" rel="noopener" class="footer-link">Compliance</a><a href="mailto:clientsupport@troopers.com.my" class="footer-link">Contact</a><a href="https://troopersapp.com/employer-signup" target="_blank" rel="noopener" class="footer-link">Sign up</a><a href="https://troopers.com.my/part-time-jobs-malaysia" target="_blank" rel="noopener" class="footer-link">Looking for work?</a></div>
     </div>
   </div>
   <div class="wrap ft-bottom">
@@ -1649,28 +1827,10 @@ window.COVERAGE = {
     var io2 = new IntersectionObserver(function(entries){
       entries.forEach(function(entry){ if(entry.isIntersecting){ trigger(); io2.unobserve(entry.target); } });
     }, {rootMargin:'0px 0px -20% 0px', threshold:0.01});
-    io2.observe(section);
+    io2.observe(document.querySelector('.globe-panel') || section);
   } else { trigger(); }
 })();
 </script>
-<script>
-/* Product features: click a feature to change the screen and the text */
-(function(){
-  var img=document.getElementById('featImg'), t=document.getElementById('featT'), d=document.getElementById('featD'), cap=document.getElementById('featCap');
-  var btns=Array.prototype.slice.call(document.querySelectorAll('.feat'));
-  if(!img||!btns.length) return;
-  btns.forEach(function(b){
-    b.addEventListener('click',function(){
-      btns.forEach(function(x){ x.classList.remove('on'); x.setAttribute('aria-pressed','false'); });
-      b.classList.add('on'); b.setAttribute('aria-pressed','true');
-      var name=b.getAttribute('data-t');
-      img.src=b.getAttribute('data-img'); img.alt=name.replace(/&amp;/g,'&')+' product screen';
-      t.innerHTML=name; d.textContent=b.getAttribute('data-d'); cap.innerHTML='Product screen · '+name;
-    });
-  });
-})();
-</script>
-
 <script>
 /* Cost calculator (same sums as the MyBurgerLab site): total = rate x shifts x hours + extras, then service fee, then 8% SST on the fee */
 (function(){
@@ -1703,6 +1863,298 @@ window.COVERAGE = {
   ['rp_rate','rp_shifts','rp_hours','rp_sf'].forEach(function(id){ document.getElementById(id).addEventListener('input',calc); });
   document.querySelectorAll('.rp-add').forEach(function(btn){ btn.addEventListener('click',function(){ var i=+btn.dataset.rp; if(!selected.has(i)){ selected.set(i,defaults[i]); btn.classList.add('is-on'); renderRows(); calc(); } }); });
   calc();
+})();
+</script>
+
+<script>
+/* ===== 2026-11-23 hook rebuild: (1) the phone in the hero plays post -> checked -> apply -> hire on a loop, (2) the "near you" finder ===== */
+(function(){
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- 1. phone ---------- */
+  var ph = document.getElementById('phone'), stepEl = document.getElementById('phStep');
+  if(ph && stepEl){
+    var titles = ['1 · Post your shift','2 · We check it','3 · Part-timers apply','4 · You choose'];
+    var timers = [], running = false, onScreen = true;
+    function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
+    function stop(){ timers.forEach(clearTimeout); timers = []; }
+    function set(n){ ph.setAttribute('data-s', n); stepEl.textContent = titles[n-1]; }
+    function cycle(){
+      stop(); ph.classList.remove('tap'); set(1);
+      later(function(){ ph.classList.add('tap'); }, 2100);
+      later(function(){ ph.classList.remove('tap'); set(2); }, 2800);
+      later(function(){ set(3); }, 4500);
+      later(function(){ set(4); }, 8200);
+      later(function(){ if(running && onScreen) cycle(); }, 13200);
+    }
+    function play(){ if(running) return; running = true; cycle(); }
+    if(reduced){ set(4); }
+    else {
+      if('IntersectionObserver' in window){
+        new IntersectionObserver(function(es){
+          onScreen = es[0].isIntersecting;
+          if(onScreen){ if(!running){ play(); } } else { running = false; stop(); }
+        }, {threshold:.25}).observe(ph);
+      } else { play(); }
+    }
+  }
+
+  /* ---------- 2. finder: crew + how many + where -> approved part-timers there ---------- */
+  var C = window.COVERAGE;
+  var rolesBox = document.getElementById('fdRoles');
+  if(!C || !rolesBox) return;
+  var ROLES = ['Service Crew','Kitchen Crew','Stewarding Crew','Barista','Banquet Crew','Hostess','Concierge','Front Desk / Receptionist','Housekeeping','Central Kitchen'];
+  var sel = document.getElementById('fdWhere'), cntEl = document.getElementById('fdCount');
+  var odoEl = document.getElementById('fdOdo'), srNum = document.getElementById('fdNumTxt'), whereEl = document.getElementById('fdWhereName'), lineEl = document.getElementById('fdLine');
+  var role = ROLES[0], count = 3, place = 'my:Selangor', shown = 0, anim = 0;
+
+  var places = {};
+  var EN = {'Pulau Pinang':'Penang'};
+  var myList = [{k:'my:fed', label:'Federal Territories (KL, Putrajaya, Labuan)', name:'Federal Territories', inName:'the Federal Territories', n:C.my.fed}];
+  Object.keys(C.my.states).forEach(function(s){ var l = EN[s] || s; myList.push({k:'my:'+s, label:l, name:l, inName:l, n:C.my.states[s]}); });
+  myList.sort(function(a,b){ return a.label.localeCompare(b.label); });
+  var sgList = Object.keys(C.sg.areas).map(function(a){ return {k:'sg:'+a, label:a, name:'Singapore, '+a, inName:'Singapore ('+a+')', n:C.sg.areas[a]}; });
+  sgList.sort(function(a,b){ return a.label.localeCompare(b.label); });
+
+  function addGroup(title, list){
+    var g = document.createElement('optgroup'); g.label = title;
+    list.forEach(function(p){ places[p.k] = p; var o = document.createElement('option'); o.value = p.k; o.textContent = p.label; g.appendChild(o); });
+    sel.appendChild(g);
+  }
+  addGroup('Malaysia', myList); addGroup('Singapore', sgList);
+  sel.value = place;
+
+  ROLES.forEach(function(r, i){
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = r; b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+    if(i === 0) b.className = 'on';
+    b.addEventListener('click', function(){
+      [].forEach.call(rolesBox.children, function(x){ x.classList.remove('on'); x.setAttribute('aria-pressed','false'); });
+      b.classList.add('on'); b.setAttribute('aria-pressed','true'); role = r; text();
+    });
+    rolesBox.appendChild(b);
+  });
+
+  function fmt(n){ return Math.round(n).toLocaleString('en-US'); }
+  function text(){
+    var p = places[place];
+    whereEl.textContent = p.name;
+    lineEl.textContent = 'These part-timers said they would work in ' + p.inName + ', in any role. Post a ' + role + ' shift for ' + count + (count === 1 ? ' person' : ' people') + ' and they can apply.';
+  }
+  function show(target){
+    shown = target; srNum.textContent = fmt(target);
+    if(window.__odo && !reduced){ window.__odo(odoEl, fmt(target)); } else { odoEl.textContent = fmt(target); }
+  }
+  function update(){ text(); show(places[place].n); }
+
+  sel.addEventListener('change', function(){ place = sel.value; update(); });
+  document.getElementById('fdMinus').addEventListener('click', function(){ if(count > 1){ count--; cntEl.textContent = count; text(); } });
+  document.getElementById('fdPlus').addEventListener('click', function(){ if(count < 50){ count++; cntEl.textContent = count; text(); } });
+
+  shown = places[place].n; odoEl.textContent = fmt(shown); srNum.textContent = fmt(shown); text();
+})();
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js" integrity="sha384-xb96EMJeax+NLXMC88ZBa1xAeAW+kn+horHh/zFlbMLG2UPWhMJJSlv7fi57hS+Q" crossorigin="anonymous"></script>
+<script>
+/* ===== GSAP motion layer (2026-11-23) =====
+   1. hero: headline words rise out of a mask, orange bar draws, phone settles in, phone floats, arches drift as you scroll
+   2. three headache cards pop in one after another and their icons draw themselves
+   3. "How it works": the phone stays in view while the three steps scroll past, and it shows what each step looks like
+      (phones: it plays the three scenes on a loop instead)
+   4. rolling digits for the finder number
+   Everything below is skipped for people who ask their device for reduced motion, and if GSAP does not load the page just works without it. */
+(function(){
+  if(typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+  gsap.registerPlugin(ScrollTrigger);
+  var hasSplit = typeof SplitText !== 'undefined';
+  if(hasSplit) gsap.registerPlugin(SplitText);
+
+  /* ---------- rolling digits ---------- */
+  window.__odo = function(el, str){
+    var chars = str.split(''), sig = chars.map(function(c){ return /\d/.test(c) ? 'd' : c; }).join('');
+    if(el.getAttribute('data-sig') !== sig){
+      el.setAttribute('data-sig', sig); el.textContent = '';
+      chars.forEach(function(c){
+        var w = document.createElement('span');
+        if(/\d/.test(c)){
+          w.className = 'od';
+          var col = document.createElement('span'); col.className = 'od-col';
+          for(var i = 0; i < 10; i++){ var d = document.createElement('span'); d.textContent = i; col.appendChild(d); }
+          w.appendChild(col);
+        } else { w.className = 'od-s'; w.textContent = c; }
+        el.appendChild(w);
+      });
+    }
+    var cols = el.querySelectorAll('.od-col'), digits = chars.filter(function(c){ return /\d/.test(c); });
+    for(var k = 0; k < cols.length; k++){
+      gsap.to(cols[k], {yPercent: -10 * (+digits[k]), duration: .85 + k * .06, ease: 'power3.out', overwrite: true});
+    }
+  };
+
+  function waitLoaded(cb){
+    if(document.body.classList.contains('loaded')) return cb();
+    var mo = new MutationObserver(function(){ if(document.body.classList.contains('loaded')){ mo.disconnect(); cb(); } });
+    mo.observe(document.body, {attributes: true, attributeFilter: ['class']});
+  }
+
+  /* ---------- 1. hero ---------- */
+  function hero(){
+    var sec = document.getElementById('heroSection'); if(!sec) return;
+    var h1 = sec.querySelector('.h1x'), eyebrow = sec.querySelector('.eyebrow'), p = sec.querySelector('.hero-p'),
+        btns = sec.querySelector('.hero-btns'), ticks = sec.querySelector('.ticks'), art = sec.querySelector('.hero2-art'),
+        arches = sec.querySelector('.arches'), phone = sec.querySelector('.phone');
+    var items = [eyebrow, p, btns, ticks, art];
+    items.concat(gsap.utils.toArray(h1.querySelectorAll('.hero-anim'))).forEach(function(e){ e.style.animation = 'none'; });
+    gsap.set(items, {autoAlpha: 0});
+    gsap.set(h1, {autoAlpha: 0, '--bar': 0});
+    arches.style.transform = 'none';
+    gsap.set(arches, {xPercent: -50, yPercent: -50, autoAlpha: 0});
+
+    function play(split){
+      var tl = gsap.timeline({defaults: {ease: 'power3.out'}, onComplete: function(){
+        if(split) split.revert();
+        gsap.set(h1, {clearProps: 'all'});
+        gsap.set([eyebrow, p, btns, ticks, art], {clearProps: 'transform,opacity,visibility'});
+        gsap.to(phone, {y: -10, duration: 3, ease: 'sine.inOut', yoyo: true, repeat: -1});
+      }});
+      tl.to(arches, {autoAlpha: .9, scale: 1, rotate: 0, duration: 1.6, ease: 'power2.out'}, 0)
+        .fromTo(eyebrow, {autoAlpha: 0, y: 14}, {autoAlpha: 1, y: 0, duration: .6}, .05)
+        .set(h1, {autoAlpha: 1}, .05);
+      if(split){ tl.fromTo(split.words, {yPercent: 118}, {yPercent: 0, duration: 1, stagger: .1, ease: 'power4.out'}, .12); }
+      else { tl.fromTo(h1, {autoAlpha: 0, y: 30}, {autoAlpha: 1, y: 0, duration: .9}, .12); }
+      tl.to(h1, {'--bar': 1, duration: .75, ease: 'power2.inOut'}, .85)
+        .fromTo(p, {autoAlpha: 0, y: 18}, {autoAlpha: 1, y: 0, duration: .7}, .7)
+        .fromTo(btns, {autoAlpha: 0, y: 18}, {autoAlpha: 1, y: 0, duration: .7}, .82)
+        .fromTo(ticks, {autoAlpha: 0, y: 14}, {autoAlpha: 1, y: 0, duration: .7}, .95)
+        .fromTo(art, {autoAlpha: 0, y: 80, rotate: 3}, {autoAlpha: 1, y: 0, rotate: 0, duration: 1.3, ease: 'power3.out'}, .3);
+    }
+    gsap.set(arches, {scale: .8, rotate: -10});
+    function start(){
+      var split = null;
+      if(hasSplit){
+        split = SplitText.create(h1, {type: 'lines,words', mask: 'lines'});
+        gsap.set(split.words, {yPercent: 118});
+      }
+      waitLoaded(function(){ gsap.delayedCall(.2, function(){ play(split); }); });
+    }
+    if(document.fonts && document.fonts.ready){ document.fonts.ready.then(start); } else { start(); }
+
+    /* drift on scroll: arches and phone move a little slower than the page */
+    gsap.to(arches, {y: -70, ease: 'none', scrollTrigger: {trigger: sec, start: 'top top', end: 'bottom top', scrub: true}});
+  }
+
+  /* ---------- 2. three headaches ---------- */
+  function headaches(){
+    var wraps = gsap.utils.toArray('#why .why-wrap'); if(!wraps.length) return;
+    var st = {trigger: '#why .why3', start: 'top 80%', once: true};
+    gsap.from(wraps, {autoAlpha: 0, y: 64, rotate: 1.6, scale: .95, duration: .95, stagger: .15, ease: 'back.out(1.3)', clearProps: 'transform,opacity,visibility', scrollTrigger: st});
+    wraps.forEach(function(w, i){
+      var els = gsap.utils.toArray(w.querySelectorAll('svg path, svg circle, svg line, svg polyline'));
+      els.forEach(function(el){ var L = el.getTotalLength(); gsap.set(el, {strokeDasharray: L, strokeDashoffset: L}); });
+      gsap.to(els, {strokeDashoffset: 0, duration: 1, ease: 'power2.inOut', stagger: .1, delay: .45 + i * .15, scrollTrigger: st,
+        onComplete: function(){ els.forEach(function(el){ el.style.strokeDasharray = ''; el.style.strokeDashoffset = ''; }); }});
+    });
+  }
+
+  /* ---------- 3. How it works ---------- */
+  function how(mode){
+    var sec = document.getElementById('how'), ph = document.getElementById('phone2');
+    if(!sec || !ph) return;
+    var steps = gsap.utils.toArray('#how .how-step'), titleEl = document.getElementById('ph2Step'), nEl = document.getElementById('ph2n');
+    var KEY = ['a','b','c'], TITLES = ['1 · Get ready','2 · Post your shift','3 · Pick your crew'];
+    var cur = -1, tl = null, timer = null;
+    function $(s){ return gsap.utils.toArray(ph.querySelectorAll(s)); }
+    sec.classList.add(mode === 'scroll' ? 'js-how' : 'js-how-auto');
+
+    function resetA(){
+      gsap.set($('.hs-a .ck'), {autoAlpha: 0, y: 18}); $('.hs-a .ck-b').forEach(function(b){ b.classList.remove('ok'); });
+      gsap.set($('.hs-a .ck-file'), {autoAlpha: 0, x: -12}); gsap.set($('.hs-a .ck-chips u'), {autoAlpha: 0, scale: .8});
+      gsap.set($('.hs-a .ck-ready'), {autoAlpha: 0, y: 16});
+    }
+    function resetB(){
+      gsap.set($('.hs-b .f-card, .hs-b .f-btn'), {autoAlpha: 0, y: 18}); nEl.textContent = '1'; ph.classList.remove('tap');
+      gsap.set($('.hs-b .toast'), {autoAlpha: 0, y: 16});
+    }
+    function resetC(){
+      gsap.set($('.hs-c .ap'), {autoAlpha: 0, x: 28}); gsap.set($('.hs-c .ap-h'), {autoAlpha: 0});
+      $('.hs-c .hire').forEach(function(h){ h.classList.remove('on'); }); gsap.set($('.hs-c .done'), {autoAlpha: 0, y: 16});
+    }
+    function buildA(){
+      var badges = $('.hs-a .ck-b'), t = gsap.timeline({delay: .4});
+      function tick(i, at){ t.call(function(){ badges[i].classList.add('ok'); }, null, at); }
+      t.to($('.hs-a .ck'), {autoAlpha: 1, y: 0, duration: .5, stagger: .22}, 0); tick(0, .8);
+      t.to($('.hs-a .ck-file'), {autoAlpha: 1, x: 0, duration: .45}, 1.2); tick(1, 1.7);
+      t.to($('.hs-a .ck-chips u'), {autoAlpha: 1, scale: 1, duration: .35, stagger: .12, ease: 'back.out(2)'}, 2); tick(2, 2.6);
+      t.to($('.hs-a .ck-ready'), {autoAlpha: 1, y: 0, duration: .5}, 3);
+      return t;
+    }
+    function buildB(){
+      var t = gsap.timeline({delay: .4});
+      t.to($('.hs-b .f-card'), {autoAlpha: 1, y: 0, duration: .5, stagger: .14}, 0)
+       .to($('.hs-b .f-btn'), {autoAlpha: 1, y: 0, duration: .5}, .5)
+       .call(function(){ nEl.textContent = '2'; }, null, 1.2).fromTo(nEl, {scale: 1.6}, {scale: 1, duration: .4, ease: 'back.out(3)'}, 1.2)
+       .call(function(){ nEl.textContent = '3'; }, null, 1.7).fromTo(nEl, {scale: 1.6}, {scale: 1, duration: .4, ease: 'back.out(3)'}, 1.7)
+       .call(function(){ ph.classList.add('tap'); }, null, 2.4)
+       .call(function(){ ph.classList.remove('tap'); }, null, 2.8)
+       .to($('.hs-b .toast'), {autoAlpha: 1, y: 0, duration: .5}, 2.9);
+      return t;
+    }
+    function buildC(){
+      var picks = $('.hs-c .pick .hire'), t = gsap.timeline({delay: .4});
+      t.to($('.hs-c .ap-h'), {autoAlpha: 1, duration: .4}, 0)
+       .to($('.hs-c .ap'), {autoAlpha: 1, x: 0, duration: .55, stagger: .4}, .15);
+      picks.forEach(function(h, i){ t.call(function(){ h.classList.add('on'); }, null, 2.7 + i * .42); });
+      t.to($('.hs-c .done'), {autoAlpha: 1, y: 0, duration: .5}, 4.1);
+      return t;
+    }
+    var RESET = [resetA, resetB, resetC], BUILD = [buildA, buildB, buildC];
+    function scene(i){
+      if(i === cur) return; cur = i;
+      steps.forEach(function(s, j){ s.classList.toggle('on', j === i); });
+      if(tl){ tl.kill(); tl = null; }
+      ph.classList.remove('tap');
+      ph.setAttribute('data-h', KEY[i]); titleEl.textContent = TITLES[i];
+      RESET[i](); tl = BUILD[i]();
+    }
+
+    /* start in "scene 1, nothing shown yet" so the phone never flashes the finished screen */
+    ph.setAttribute('data-h', 'a'); titleEl.textContent = TITLES[0]; resetA(); resetB(); resetC();
+
+    if(mode === 'scroll'){
+      /* the scene always follows where the steps are on screen (not the order triggers fire), so jumping in from the menu cannot get it out of order */
+      var sync = function(){
+        var line = window.innerHeight * .62, idx = 0;
+        steps.forEach(function(s, i){ if(s.getBoundingClientRect().top <= line) idx = i; });
+        scene(idx);
+      };
+      ScrollTrigger.create({trigger: '.how-grid', start: 'top 80%', end: 'bottom top', onEnter: sync, onEnterBack: sync, onUpdate: sync});
+      gsap.utils.toArray('#how .how-link i').forEach(function(bar){
+        gsap.fromTo(bar, {scaleY: 0}, {scaleY: 1, ease: 'none', scrollTrigger: {trigger: bar.parentNode, start: 'top 72%', end: 'bottom 58%', scrub: true}});
+      });
+    } else {
+      var HOLD = [4800, 4600, 6000];
+      function next(){ var n = (cur + 1) % 3; scene(n); timer = setTimeout(next, HOLD[n]); }
+      function start(){ if(timer) return; cur = -1; next(); }
+      function stop(){ clearTimeout(timer); timer = null; }
+      ScrollTrigger.create({trigger: ph, start: 'top 88%', end: 'bottom 12%', onToggle: function(self){ if(self.isActive) start(); else stop(); }});
+    }
+
+    return function(){   /* back to the plain, finished screen if the window changes size or motion gets switched off */
+      clearTimeout(timer); timer = null; if(tl) tl.kill(); tl = null; cur = -1;
+      sec.classList.remove('js-how', 'js-how-auto'); steps.forEach(function(s){ s.classList.remove('on'); });
+      ph.classList.remove('tap'); gsap.set(ph.querySelectorAll('*'), {clearProps: 'all'});
+      ph.setAttribute('data-h', 'c'); titleEl.textContent = TITLES[2]; nEl.textContent = '3';
+      $('.ck-b').forEach(function(b){ b.classList.add('ok'); }); $('.pick .hire').forEach(function(h){ h.classList.add('on'); });
+    };
+  }
+
+  var mm = gsap.matchMedia();
+  mm.add('(prefers-reduced-motion: no-preference)', function(){ hero(); headaches(); });
+  mm.add('(prefers-reduced-motion: no-preference) and (min-width: 901px)', function(){ return how('scroll'); });
+  mm.add('(prefers-reduced-motion: no-preference) and (max-width: 900px)', function(){ return how('auto'); });
+  window.addEventListener('load', function(){ ScrollTrigger.refresh(); });
 })();
 </script>
 </body>
